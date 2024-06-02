@@ -5,7 +5,7 @@ import { ImperativePanelHandle } from "react-resizable-panels";
 import { Button } from "~/components/ui/button";
 import { ResizablePanel, ResizablePanelGroup } from "~/components/ui/resizable";
 import styles from "./dashboard.module.css";
-import { DashboardIcon } from "@radix-ui/react-icons";
+import { DashboardIcon, DoubleArrowLeftIcon } from "@radix-ui/react-icons";
 
 export default function DashboardLayout({
   children,
@@ -20,15 +20,37 @@ export default function DashboardLayout({
         <ResizablePanel
           defaultSize={15}
           collapsedSize={3}
+          minSize={3}
           collapsible={true}
           is="aside"
           className={`dark !min-w-[70px] bg-secondary text-secondary-foreground transition-all ease-out ${styles["sidebar-container"]} space-y-3 p-3`}
           ref={sidebarRef}
         >
-          <div>
-            <span>This is </span>
-            Sidebar
+          <div className="flex items-center justify-between border-b border-secondary-foreground pb-3">
+            <span className="w-[90%]">Dashboard</span>
+            <Button
+              onClick={(e) => {
+                // @ts-ignore
+                const child = e.target.children[0];
+                const sidebar = sidebarRef.current;
+                if (!sidebar) return;
+
+                if (sidebar.isCollapsed()) {
+                  sidebar.expand();
+                  child.style.rotate = "0deg";
+                } else {
+                  sidebar.collapse();
+                  child.style.rotate = "180deg";
+                }
+              }}
+              size={"icon"}
+              className="dark flex-grow"
+              variant={"ghost"}
+            >
+              <DoubleArrowLeftIcon className="pointer-events-none transition-all" />
+            </Button>
           </div>
+
           <Button className="w-full justify-start space-x-3">
             <DashboardIcon />
             <span>Dashboard</span>
@@ -36,17 +58,6 @@ export default function DashboardLayout({
         </ResizablePanel>
 
         <ResizablePanel defaultSize={85} collapsible={false} is="main">
-          <Button
-            onClick={() => {
-              const sidebar = sidebarRef.current;
-              if (!sidebar) return;
-
-              if (sidebar.isCollapsed()) sidebar.expand();
-              else sidebar.collapse();
-            }}
-          >
-            Collapse Sidebar
-          </Button>
           {children}
         </ResizablePanel>
       </ResizablePanelGroup>
