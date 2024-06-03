@@ -30,8 +30,9 @@ export default function DashboardLayout({
             <span className="w-[90%]">Dashboard</span>
             <Button
               onClick={(e) => {
-                // @ts-ignore
-                const child = e.target.children[0];
+                const element = e.target as HTMLElement;
+                const child = element.children[0] as HTMLElement;
+
                 const sidebar = sidebarRef.current;
                 if (!sidebar) return;
 
