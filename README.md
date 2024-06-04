@@ -3,7 +3,8 @@
 ## TODO
 
 - [x] Make it deploy `31.05.2024`
-- [ ] Scaffold basic UI with mock data `in progress`
+- [x] Scaffold basic UI with mock data `04.06.2024`
+- [ ] Tidy up build process `in progress`
 - [ ] Set up database
 - [ ] Attach database to UI
 - [ ] Add authentication

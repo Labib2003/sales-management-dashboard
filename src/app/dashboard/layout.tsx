@@ -73,6 +73,7 @@ export default function DashboardLayout({
           {sidebarLinks}
         </ResizablePanel>
 
+        {/*for small screens*/}
         <Sheet>
           <SheetTrigger className="block lg:hidden">Open</SheetTrigger>
           <SheetContent is="aside" side={"left"} className="dark bg-secondary">
