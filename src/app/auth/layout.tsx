@@ -6,8 +6,8 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid min-h-screen grid-cols-3">
-      <aside className="flex items-center bg-primary-foreground">
+    <div className="grid min-h-screen grid-cols-1 md:grid-cols-3">
+      <aside className="hidden items-center bg-primary-foreground md:flex">
         <Image
           src={"/assets/illustrations/data_trends.png"}
           alt=""
