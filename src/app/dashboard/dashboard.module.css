@@ -1,0 +1,14 @@
+.sidebar-container {
+  container-type: inline-size;
+}
+
+@container (max-width: 120px) {
+  .sidebar-container>* {
+    text-align: center;
+    justify-content: center;
+  }
+
+  .sidebar-container>*>span {
+    display: none;
+  }
+}
