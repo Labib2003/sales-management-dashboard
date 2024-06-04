@@ -9,7 +9,6 @@ import { DashboardIcon, DoubleArrowLeftIcon } from "@radix-ui/react-icons";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
