@@ -17,6 +17,12 @@ import {
 import { TypographyH3 } from "~/components/ui/typography";
 import { db } from "~/server/db";
 import DeleteUserModal from "./DeleteUserModal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +67,18 @@ export default async function Users() {
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.phone}</TableCell>
               <TableCell className="uppercase">{user.role}</TableCell>
-              <TableCell className="truncate">{user.address}</TableCell>
+              <TableCell>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="max-w-[12ch] truncate">{user.address}</p>
+                    </TooltipTrigger>
+                    <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
+                      <p>{user.address}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
               <TableCell className="text-center">
                 <DeleteUserModal />
               </TableCell>
