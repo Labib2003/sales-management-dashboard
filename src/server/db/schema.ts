@@ -4,6 +4,7 @@
 import { sql } from "drizzle-orm";
 import {
   index,
+  pgEnum,
   pgTableCreator,
   serial,
   timestamp,
@@ -20,11 +21,26 @@ export const createTable = pgTableCreator(
   (name) => `sales-management-dashboard_${name}`,
 );
 
-export const posts = createTable(
-  "post",
+export const roleEnum = pgEnum("role_enum", [
+  "guest",
+  "salesman",
+  "manager",
+  "admin",
+  "superadmin",
+]);
+
+export const users = createTable(
+  "user",
   {
     id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
+
+    name: varchar("name", { length: 256 }).notNull(),
+    email: varchar("email", { length: 256 }).notNull(),
+    password: varchar("password", { length: 256 }).notNull(),
+    role: roleEnum("role").default("guest").notNull(),
+    phone: varchar("phone", { length: 256 }).notNull(),
+    address: varchar("address", { length: 1024 }).notNull(),
+
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

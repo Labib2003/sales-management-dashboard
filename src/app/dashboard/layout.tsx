@@ -1,11 +1,16 @@
 "use client";
 
 import { useRef } from "react";
-import { ImperativePanelHandle } from "react-resizable-panels";
-import { Button } from "~/components/ui/button";
+import { type ImperativePanelHandle } from "react-resizable-panels";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { ResizablePanel, ResizablePanelGroup } from "~/components/ui/resizable";
 import styles from "./dashboard.module.css";
-import { DashboardIcon, DoubleArrowLeftIcon } from "@radix-ui/react-icons";
+import {
+  DashboardIcon,
+  DoubleArrowLeftIcon,
+  HamburgerMenuIcon,
+  PersonIcon,
+} from "@radix-ui/react-icons";
 import {
   Sheet,
   SheetContent,
@@ -13,15 +18,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
-
-const sidebarLinks = (
-  <>
-    <Button className="w-full justify-start space-x-3">
-      <DashboardIcon />
-      <span>Dashboard</span>
-    </Button>
-  </>
-);
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { cn } from "~/lib/utils";
 
 export default function DashboardLayout({
   children,
@@ -29,6 +28,36 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const sidebarRef = useRef<ImperativePanelHandle>(null);
+  const currentSegment = usePathname().split("/").pop();
+
+  const sidebarLinks = (
+    <>
+      <Link
+        href={"/dashboard"}
+        className={cn(
+          buttonVariants({
+            variant: currentSegment === "dashboard" ? "default" : "outline",
+          }),
+          "w-full justify-start space-x-3",
+        )}
+      >
+        <DashboardIcon />
+        <span>Dashboard</span>
+      </Link>
+      <Link
+        href={"/dashboard/users"}
+        className={cn(
+          buttonVariants({
+            variant: currentSegment === "users" ? "default" : "outline",
+          }),
+          "w-full justify-start space-x-3",
+        )}
+      >
+        <PersonIcon />
+        <span>Users</span>
+      </Link>
+    </>
+  );
 
   return (
     <div>
@@ -36,8 +65,8 @@ export default function DashboardLayout({
         {/*for large screens*/}
         <ResizablePanel
           defaultSize={15}
-          collapsedSize={3}
-          minSize={3}
+          collapsedSize={4}
+          minSize={4}
           collapsible={true}
           is="aside"
           className={`dark !min-w-[70px] bg-secondary text-secondary-foreground transition-all ease-out ${styles["sidebar-container"]} hidden space-y-3 p-3 lg:block`}
@@ -72,19 +101,32 @@ export default function DashboardLayout({
           {sidebarLinks}
         </ResizablePanel>
 
-        {/*for small screens*/}
-        <Sheet>
-          <SheetTrigger className="block lg:hidden">Open</SheetTrigger>
-          <SheetContent is="aside" side={"left"} className="dark bg-secondary">
-            <SheetHeader>
-              <SheetTitle className="mb-5">Dashboard</SheetTitle>
-            </SheetHeader>
-            {sidebarLinks}
-          </SheetContent>
-        </Sheet>
-
         <ResizablePanel defaultSize={85} collapsible={false} is="main">
-          {children}
+          <header className="dark flex items-center justify-between bg-secondary p-1 lg:hidden">
+            {/*for small screens*/}
+            <Sheet>
+              <SheetTrigger
+                className={buttonVariants({
+                  variant: "ghost",
+                  size: "icon",
+                })}
+              >
+                <HamburgerMenuIcon className="text-white" />
+              </SheetTrigger>
+              <SheetContent
+                is="aside"
+                side={"left"}
+                className="dark bg-secondary text-secondary-foreground"
+              >
+                <SheetHeader>
+                  <SheetTitle className="mb-5">Dashboard</SheetTitle>
+                </SheetHeader>
+                {sidebarLinks}
+              </SheetContent>
+            </Sheet>
+          </header>
+
+          <div className="px-3 py-5">{children}</div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

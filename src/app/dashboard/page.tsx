@@ -1,9 +1,24 @@
-import { db } from "~/server/db";
-
-export const dynamic = "force-dynamic";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "~/components/ui/breadcrumb";
+import { TypographyH3 } from "~/components/ui/typography";
 
 export default async function Dashboard() {
-  const posts = await db.query.posts.findMany();
-
-  return <div>{JSON.stringify(posts)}</div>;
+  return (
+    <div>
+      <header>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <TypographyH3>Dashboard</TypographyH3>
+      </header>
+    </div>
+  );
 }
