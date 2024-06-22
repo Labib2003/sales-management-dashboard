@@ -1,4 +1,7 @@
+"use client";
+
 import { TrashIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Dialog,
@@ -10,10 +13,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { deleteUser } from "~/server/actions/user.actions";
 
-const DeleteUserModal = () => {
+const DeleteUserModal = ({ userId }: { userId: number }) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         className={buttonVariants({ size: "icon", variant: "destructive" })}
       >
@@ -33,7 +39,15 @@ const DeleteUserModal = () => {
               Cancel
             </Button>
           </DialogClose>
-          <Button type="button" variant="destructive" size={"sm"}>
+          <Button
+            type="button"
+            variant="destructive"
+            size={"sm"}
+            onClick={async () => {
+              const res = await deleteUser(userId);
+              if (res.success) setOpen(false);
+            }}
+          >
             Confirm
           </Button>
         </DialogFooter>

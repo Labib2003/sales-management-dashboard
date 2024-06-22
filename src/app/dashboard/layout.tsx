@@ -126,7 +126,7 @@ export default function DashboardLayout({
             </Sheet>
           </header>
 
-          <div className="px-3 py-5">{children}</div>
+          <div className="p-5">{children}</div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
