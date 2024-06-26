@@ -25,11 +25,19 @@ import {
 import CreateUserModal from "./CreateUserModal";
 import { getUsers } from "~/server/queries/user.queries";
 import UpdateUserModal from "./UpdateUserModal";
+import HandlePagination from "~/components/custom/HandlePagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function Users() {
-  const users = await getUsers();
+export default async function Users({
+  searchParams,
+}: {
+  searchParams?: { page?: number; limit?: number };
+}) {
+  const { total, data: users } = await getUsers(
+    searchParams?.page,
+    searchParams?.limit,
+  );
 
   return (
     <div>
@@ -53,48 +61,55 @@ export default async function Users() {
           <CreateUserModal />
         </div>
       </header>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Id</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead className="text-center">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.id}</TableCell>
-              <TableCell className="capitalize">{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phone ?? "N/A"}</TableCell>
-              <TableCell className="uppercase">{user.role}</TableCell>
-              <TableCell>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="max-w-[12ch] truncate">
-                        {user.address ?? "N/A"}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                      <p>{user.address}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </TableCell>
-              <TableCell className="space-x-2 text-center">
-                <UpdateUserModal user={user} />
-                <DeleteUserModal userId={user.id} />
-              </TableCell>
+
+      <main>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Id</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">{user.id}</TableCell>
+                <TableCell className="capitalize">{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.phone ?? "N/A"}</TableCell>
+                <TableCell className="uppercase">{user.role}</TableCell>
+                <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="max-w-[12ch] truncate">
+                          {user.address ?? "N/A"}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
+                        <p>{user.address}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+                <TableCell className="space-x-2 text-center">
+                  <UpdateUserModal user={user} />
+                  <DeleteUserModal userId={user.id} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </main>
+
+      <footer className="pt-5">
+        <HandlePagination total={total} />
+      </footer>
     </div>
   );
 }

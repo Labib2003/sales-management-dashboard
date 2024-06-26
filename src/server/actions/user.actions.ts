@@ -11,7 +11,6 @@ import {
 } from "~/validators/user.validators";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
-import transporter from "~/lib/nodemailer";
 
 type Response = {
   success: boolean;
@@ -33,23 +32,23 @@ export async function createUser(
       .insert(users)
       .values({ ...parsedData.data, password: hashedPassword });
 
-    const mailOptions = {
-      from: process.env.GMAIL_EMAIL,
-      to: parsedData.data.email,
-      subject: "Your New Auto-Generated Password",
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #4CAF50;">Welcome!</h2>
-          <p>Your new account has been successfully created. Below is your auto-generated password:</p>
-          <p style="font-size: 16px; font-weight: bold; color: #333;">${initialPassword}</p>
-          <p>For security reasons, we strongly recommend that you change this password to a custom one as soon as possible.</p>
-          <p>If you have any questions or need further assistance, please don't hesitate to contact our support team.</p>
-          <p>Best regards,</p>
-          <p>Your Company Name</p>
-        </div>
-      `,
-    };
-    await transporter.sendMail(mailOptions);
+    // const mailOptions = {
+    //   from: process.env.GMAIL_EMAIL,
+    //   to: parsedData.data.email,
+    //   subject: "Your New Auto-Generated Password",
+    //   html: `
+    //     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    //       <h2 style="color: #4CAF50;">Welcome!</h2>
+    //       <p>Your new account has been successfully created. Below is your auto-generated password:</p>
+    //       <p style="font-size: 16px; font-weight: bold; color: #333;">${initialPassword}</p>
+    //       <p>For security reasons, we strongly recommend that you change this password to a custom one as soon as possible.</p>
+    //       <p>If you have any questions or need further assistance, please don't hesitate to contact our support team.</p>
+    //       <p>Best regards,</p>
+    //       <p>Your Company Name</p>
+    //     </div>
+    //   `,
+    // };
+    // await transporter.sendMail(mailOptions);
 
     revalidatePath("/dashboard/users");
   } catch (error) {
@@ -60,7 +59,11 @@ export async function createUser(
     };
   }
 
-  return { success: true, message: "User created" };
+  return {
+    success: true,
+    message:
+      "User created with auto generated password. The password is mailed to the user.",
+  };
 }
 
 export async function deleteUser(userId: number): Promise<Response> {
