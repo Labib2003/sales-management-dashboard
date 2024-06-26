@@ -5,19 +5,22 @@ import { revalidatePath } from "next/cache";
 import { type z } from "zod";
 import { db } from "~/server/db";
 import { users } from "~/server/db/schema";
-import { createUserSchema } from "~/validators/user.validators";
+import {
+  createUserSchema,
+  updateUserSchema,
+} from "~/validators/user.validators";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import transporter from "~/lib/nodemailer";
 
-type FormState = {
+type Response = {
   success: boolean;
   message: string;
 };
 
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
-): Promise<FormState> {
+): Promise<Response> {
   const parsedData = createUserSchema.safeParse(data);
 
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -60,11 +63,32 @@ export async function createUser(
   return { success: true, message: "User created" };
 }
 
-export async function deleteUser(userId: number): Promise<FormState> {
+export async function deleteUser(userId: number): Promise<Response> {
   try {
-    await db.delete(users).where(eq(users.id, userId));
+    await db.update(users).set({ active: false }).where(eq(users.id, userId));
     revalidatePath("/dashboard/users");
     return { success: true, message: "User deleted" };
+  } catch (error) {
+    const castedError = error as Error;
+    return {
+      success: false,
+      message: castedError.message ?? "An error occurred",
+    };
+  }
+}
+
+export async function updateUser(
+  userId: number,
+  data: z.infer<typeof updateUserSchema>,
+): Promise<Response> {
+  try {
+    const parsedData = updateUserSchema.safeParse(data);
+
+    if (!parsedData.success) return { success: false, message: "Invalid data" };
+
+    await db.update(users).set(parsedData.data).where(eq(users.id, userId));
+    revalidatePath("/dashboard/users");
+    return { success: true, message: "User updated" };
   } catch (error) {
     const castedError = error as Error;
     return {

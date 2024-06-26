@@ -15,7 +15,6 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { TypographyH3 } from "~/components/ui/typography";
-import { db } from "~/server/db";
 import DeleteUserModal from "./DeleteUserModal";
 import {
   Tooltip,
@@ -24,11 +23,13 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import CreateUserModal from "./CreateUserModal";
+import { getUsers } from "~/server/queries/user.queries";
+import UpdateUserModal from "./UpdateUserModal";
 
 export const dynamic = "force-dynamic";
 
 export default async function Users() {
-  const users = await db.query.users.findMany();
+  const users = await getUsers();
 
   return (
     <div>
@@ -86,7 +87,8 @@ export default async function Users() {
                   </Tooltip>
                 </TooltipProvider>
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="space-x-2 text-center">
+                <UpdateUserModal user={user} />
                 <DeleteUserModal userId={user.id} />
               </TableCell>
             </TableRow>
