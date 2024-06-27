@@ -6,7 +6,7 @@
 - [x] Scaffold basic UI with mock data `04.06.2024`
 - [x] Tidy up build process `04.06.2024`
 - [x] Set up database `04.06.2024`
-- [ ] Attach database to UI `in progress`
+- [x] Attach database to UI `28.06.2024`
 - [ ] Add authentication
 - [ ] Error management
 - [ ] Add rest of the features
