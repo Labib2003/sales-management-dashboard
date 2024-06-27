@@ -26,22 +26,29 @@ import CreateUserModal from "./CreateUserModal";
 import { getUsers } from "~/server/queries/user.queries";
 import UpdateUserModal from "./UpdateUserModal";
 import HandlePagination from "~/components/custom/HandlePagination";
-
-export const dynamic = "force-dynamic";
+import HandleSearch from "~/components/custom/HandleSearch";
+import HandleUserRoleFilter from "./HandleUserRoleFilter";
 
 export default async function Users({
   searchParams,
 }: {
-  searchParams?: { page?: number; limit?: number };
+  searchParams?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+  };
 }) {
-  const { total, data: users } = await getUsers(
-    searchParams?.page,
-    searchParams?.limit,
-  );
+  const { total, data: users } = await getUsers({
+    page: searchParams?.page,
+    limit: searchParams?.limit,
+    search: searchParams?.search,
+    role: searchParams?.role,
+  });
 
   return (
     <div>
-      <header className="mb-5 flex flex-wrap items-center justify-between gap-2">
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
         <div>
           <Breadcrumb>
             <BreadcrumbList>
@@ -57,7 +64,11 @@ export default async function Users({
           <TypographyH3>User/Employee List</TypographyH3>
         </div>
 
-        <div>
+        <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
+            <HandleUserRoleFilter />
+            <HandleSearch />
+          </div>
           <CreateUserModal />
         </div>
       </header>
