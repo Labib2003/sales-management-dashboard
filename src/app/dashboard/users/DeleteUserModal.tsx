@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/dialog";
 import { deleteUser } from "~/server/actions/user.actions";
 
-const DeleteUserModal = ({ userId }: { userId: number }) => {
+const DeleteUserModal = ({ userId }: { userId: string }) => {
   const [open, setOpen] = useState(false);
 
   return (

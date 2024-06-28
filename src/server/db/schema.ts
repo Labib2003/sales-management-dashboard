@@ -1,15 +1,15 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { type InferModel, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
   pgEnum,
   pgTableCreator,
-  serial,
   timestamp,
   varchar,
+  text,
 } from "drizzle-orm/pg-core";
 import { userRoles } from "~/constants";
 
@@ -19,16 +19,14 @@ import { userRoles } from "~/constants";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator(
-  (name) => `sales-management-dashboard_${name}`,
-);
+export const createTable = pgTableCreator((name) => `smd_${name}`);
 
-export const roleEnum = pgEnum("role_enum", userRoles);
+const roleEnum = pgEnum("role_enum", userRoles);
 
 export const users = createTable(
   "user",
   {
-    id: serial("id").primaryKey(),
+    id: text("id").primaryKey(),
 
     name: varchar("name", { length: 256 }).notNull(),
     email: varchar("email", { length: 256 }).notNull().unique(),
@@ -48,3 +46,14 @@ export const users = createTable(
     emailIndex: index("email_idx").on(example.email),
   }),
 );
+
+export const sessions = createTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+});

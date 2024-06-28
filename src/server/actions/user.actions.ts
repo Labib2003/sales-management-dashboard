@@ -28,9 +28,11 @@ export async function createUser(
     const initialPassword = crypto.randomUUID().split("-")[0]!;
     const hashedPassword = await bcrypt.hash(initialPassword, 10);
 
-    await db
-      .insert(users)
-      .values({ ...parsedData.data, password: hashedPassword });
+    await db.insert(users).values({
+      ...parsedData.data,
+      id: crypto.randomUUID(),
+      password: hashedPassword,
+    });
 
     // const mailOptions = {
     //   from: process.env.GMAIL_EMAIL,
@@ -66,7 +68,7 @@ export async function createUser(
   };
 }
 
-export async function deleteUser(userId: number): Promise<Response> {
+export async function deleteUser(userId: string): Promise<Response> {
   try {
     await db.update(users).set({ active: false }).where(eq(users.id, userId));
     revalidatePath("/dashboard/users");
@@ -81,7 +83,7 @@ export async function deleteUser(userId: number): Promise<Response> {
 }
 
 export async function updateUser(
-  userId: number,
+  userId: string,
   data: z.infer<typeof updateUserSchema>,
 ): Promise<Response> {
   try {

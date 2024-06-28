@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
+import { ReactQueryClientProvider } from "~/components/HOC/ReactQueryClientProvider";
 
 export const metadata = {
   title: "Create T3 App",
@@ -20,16 +21,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
-        {children}
-        <Toaster richColors />
-      </body>
-    </html>
+    <ReactQueryClientProvider>
+      <html lang="en">
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable,
+          )}
+        >
+          {children}
+          <Toaster richColors />
+        </body>
+      </html>
+    </ReactQueryClientProvider>
   );
 }
