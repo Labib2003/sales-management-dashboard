@@ -24,6 +24,14 @@ import Link from "next/link";
 import { cn } from "~/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { type users } from "~/server/db/schema";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { logout } from "~/server/actions/auth.actions";
+import { TypographyP, TypographySmall } from "~/components/ui/typography";
+import { Badge } from "~/components/ui/badge";
 
 export default function SidebarWrapper({
   children,
@@ -63,27 +71,41 @@ export default function SidebarWrapper({
       </Link>
 
       <div className="flex-grow" />
-      <div
-        className={cn(
-          buttonVariants({
-            variant: "outline",
-          }),
-          "w-full justify-start space-x-3 py-6",
-        )}
-      >
-        <div>
-          <Avatar className="h-[2rem] w-[2rem]">
-            <AvatarImage src={currentUser.profilePicture ?? ""} />
-            <AvatarFallback className="bg-primary">
-              {currentUser.name
-                .split(" ")
-                .map((word) => word[0]?.toUpperCase())
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-        <span>{currentUser.name}</span>
-      </div>
+      <Popover>
+        <PopoverTrigger
+          className={cn(
+            buttonVariants({
+              variant: "outline",
+            }),
+            "w-full justify-start space-x-3 py-6",
+          )}
+        >
+          <div>
+            <Avatar className="h-[2rem] w-[2rem]">
+              <AvatarImage src={currentUser.profilePicture ?? ""} />
+              <AvatarFallback className="dark bg-primary">
+                {currentUser.name
+                  .split(" ")
+                  .map((word) => word[0]?.toUpperCase())
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <span>{currentUser.name}</span>
+        </PopoverTrigger>
+        <PopoverContent className="dark">
+          <TypographyP className="mb-3">
+            <span className="flex items-center justify-between">
+              {currentUser.name}
+              <Badge className="uppercase">{currentUser.role}</Badge>
+            </span>
+            <TypographySmall>{currentUser.email}</TypographySmall>
+          </TypographyP>
+          <Button className="w-full" onClick={() => logout()}>
+            Log Out
+          </Button>
+        </PopoverContent>
+      </Popover>
     </>
   );
 

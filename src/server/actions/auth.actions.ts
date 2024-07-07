@@ -8,6 +8,7 @@ import { lucia } from "~/lib/lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { validateRequest } from "~/lib/validateRequest";
+import { type ActionResult } from "next/dist/server/app-render/types";
 
 type Response = {
   success: boolean;
@@ -46,3 +47,19 @@ export const getCurrentUser = async () => {
 
   return currentUser;
 };
+
+export async function logout() {
+  "use server";
+  const { session } = await validateRequest();
+  if (!session) return;
+
+  await lucia.invalidateSession(session.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+  return redirect("/auth/login");
+}
