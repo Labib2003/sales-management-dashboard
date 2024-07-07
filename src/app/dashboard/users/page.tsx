@@ -28,6 +28,7 @@ import UpdateUserModal from "./UpdateUserModal";
 import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
+import Link from "next/link";
 
 export default async function Users({
   searchParams,
@@ -53,7 +54,9 @@ export default async function Users({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
