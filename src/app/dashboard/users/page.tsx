@@ -28,6 +28,7 @@ import UpdateUserModal from "./UpdateUserModal";
 import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
+import Link from "next/link";
 
 export default async function Users({
   searchParams,
@@ -53,7 +54,9 @@ export default async function Users({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -77,7 +80,6 @@ export default async function Users({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Id</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -89,24 +91,27 @@ export default async function Users({
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.id}</TableCell>
                 <TableCell className="capitalize">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone ?? "N/A"}</TableCell>
                 <TableCell className="uppercase">{user.role}</TableCell>
                 <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <p className="max-w-[12ch] truncate">
-                          {user.address ?? "N/A"}
-                        </p>
-                      </TooltipTrigger>
-                      <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                        <p>{user.address}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {user.address ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <p className="max-w-[12ch] truncate">
+                            {user.address}
+                          </p>
+                        </TooltipTrigger>
+                        <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
+                          <p>{user.address}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    "N/A"
+                  )}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
                   <UpdateUserModal user={user} />

@@ -14,7 +14,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { useRef } from "react";
+import { login } from "~/server/actions/auth.actions";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -22,7 +23,6 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,9 +41,10 @@ export default function Login() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (data) => {
-            console.log(data);
+            const res = await login(data.email, data.password);
+            if (res?.success === false) toast.error(res?.message);
+            window.location.reload();
           })}
-          ref={formRef}
           className="space-y-8"
         >
           <FormField
