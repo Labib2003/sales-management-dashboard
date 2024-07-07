@@ -37,8 +37,12 @@ export async function login(
   return redirect("/dashboard");
 }
 
-export const getUser = async () => {
-  "use server";
+export const getCurrentUser = async () => {
   const { user } = await validateRequest();
-  return user;
+  const [currentUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user?.id ?? ""));
+
+  return currentUser;
 };
