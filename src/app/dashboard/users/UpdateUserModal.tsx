@@ -35,8 +35,6 @@ import { updateUser } from "~/server/actions/user.actions";
 import { type users } from "~/server/db/schema";
 import { updateUserSchema } from "~/validators/user.validators";
 
-const assignableRoles = userRoles.filter((role) => role !== "superadmin");
-
 const UpdateUserModal = ({
   user,
 }: {
@@ -87,7 +85,7 @@ const UpdateUserModal = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {assignableRoles.map((role) => (
+                      {userRoles.map((role) => (
                         <SelectItem key={role} value={role}>
                           {role}
                         </SelectItem>

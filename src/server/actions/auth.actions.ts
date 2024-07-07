@@ -8,7 +8,6 @@ import { lucia } from "~/lib/lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { validateRequest } from "~/lib/validateRequest";
-import { type ActionResult } from "next/dist/server/app-render/types";
 
 type Response = {
   success: boolean;

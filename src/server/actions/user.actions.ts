@@ -11,6 +11,7 @@ import {
 } from "~/validators/user.validators";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import { validateRequest } from "~/lib/validateRequest";
 
 type Response = {
   success: boolean;
@@ -20,9 +21,14 @@ type Response = {
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
 ): Promise<Response> {
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
   const parsedData = createUserSchema.safeParse(data);
 
   if (!parsedData.success) return { success: false, message: "Invalid data" };
+  console.log(parsedData.data);
 
   try {
     const initialPassword = crypto.randomUUID().split("-")[0]!;
@@ -69,6 +75,10 @@ export async function createUser(
 }
 
 export async function deleteUser(userId: string): Promise<Response> {
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
   try {
     await db.update(users).set({ active: false }).where(eq(users.id, userId));
     revalidatePath("/dashboard/users");
@@ -86,12 +96,22 @@ export async function updateUser(
   userId: string,
   data: z.infer<typeof updateUserSchema>,
 ): Promise<Response> {
+  const { user } = await validateRequest();
+  const parsedData = updateUserSchema.safeParse(data);
+  if (!parsedData.success) return { success: false, message: "Invalid data" };
+  let updateData: Record<string, unknown> = {};
+
+  if (["superadmin", "admin"].includes(user?.role ?? "")) {
+    const { role } = parsedData.data;
+    updateData = { role };
+  } else if (user?.id === userId) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { role, ...data } = parsedData.data;
+    updateData = data;
+  } else return { success: false, message: "Unauthorized" };
+
   try {
-    const parsedData = updateUserSchema.safeParse(data);
-
-    if (!parsedData.success) return { success: false, message: "Invalid data" };
-
-    await db.update(users).set(parsedData.data).where(eq(users.id, userId));
+    await db.update(users).set(updateData).where(eq(users.id, userId));
     revalidatePath("/dashboard/users");
     return { success: true, message: "User updated" };
   } catch (error) {

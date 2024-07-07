@@ -8,7 +8,6 @@ import styles from "./dashboard.module.css";
 import {
   DashboardIcon,
   DoubleArrowLeftIcon,
-  ExitIcon,
   HamburgerMenuIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
