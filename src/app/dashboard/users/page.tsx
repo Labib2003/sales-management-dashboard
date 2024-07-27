@@ -29,6 +29,8 @@ import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
 import Link from "next/link";
+import { buttonVariants } from "~/components/ui/button";
+import { EyeOpenIcon } from "@radix-ui/react-icons";
 
 export default async function Users({
   searchParams,
@@ -114,6 +116,16 @@ export default async function Users({
                   )}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
+                  <Link
+                    href={`/dashboard/users/${user.id}`}
+                    className={buttonVariants({
+                      size: "icon",
+                      variant: "outline",
+                      className: "hover:text-white",
+                    })}
+                  >
+                    <EyeOpenIcon />
+                  </Link>
                   <UpdateUserModal user={user} />
                   <DeleteUserModal userId={user.id} />
                 </TableCell>

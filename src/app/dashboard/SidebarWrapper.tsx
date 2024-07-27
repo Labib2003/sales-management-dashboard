@@ -40,7 +40,7 @@ export default function SidebarWrapper({
   currentUser: typeof users.$inferSelect;
 }) {
   const sidebarRef = useRef<ImperativePanelHandle>(null);
-  const currentSegment = usePathname().split("/").pop();
+  const currentSegment = usePathname().split("/");
 
   const sidebarLinks = (
     <>
@@ -48,7 +48,10 @@ export default function SidebarWrapper({
         href={"/dashboard"}
         className={cn(
           buttonVariants({
-            variant: currentSegment === "dashboard" ? "default" : "outline",
+            variant:
+              currentSegment[currentSegment.length - 1] === "dashboard"
+                ? "default"
+                : "outline",
           }),
           "w-full justify-start space-x-3 border-none",
         )}
@@ -60,7 +63,7 @@ export default function SidebarWrapper({
         href={"/dashboard/users"}
         className={cn(
           buttonVariants({
-            variant: currentSegment === "users" ? "default" : "outline",
+            variant: currentSegment.includes("users") ? "default" : "outline",
           }),
           "w-full justify-start space-x-3 border-none",
         )}
@@ -92,7 +95,7 @@ export default function SidebarWrapper({
           </div>
           <span>{currentUser.name}</span>
         </PopoverTrigger>
-        <PopoverContent className="dark">
+        <PopoverContent className="dark space-y-2">
           <TypographyP className="mb-3">
             <span className="flex items-center justify-between">
               {currentUser.name}
@@ -100,6 +103,12 @@ export default function SidebarWrapper({
             </span>
             <TypographySmall>{currentUser.email}</TypographySmall>
           </TypographyP>
+          <Link
+            href={`/dashboard/users/${currentUser.id}`}
+            className={buttonVariants({ className: "w-full" })}
+          >
+            My Profile
+          </Link>
           <Button className="w-full" onClick={() => logout()}>
             Log Out
           </Button>
