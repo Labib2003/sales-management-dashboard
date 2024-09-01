@@ -5,6 +5,7 @@ import { users } from "../db/schema";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 type UserField = keyof typeof users.$inferSelect;
+
 type GetUserArgs = {
   page?: number;
   limit?: number;
@@ -42,4 +43,10 @@ export async function getUsers(arg: GetUserArgs) {
   ]);
 
   return { total: total?.count ?? 0, data };
+}
+
+export async function getUserById(id: string) {
+  const [user] = await db.select().from(users).where(eq(users.id, id));
+
+  return user;
 }

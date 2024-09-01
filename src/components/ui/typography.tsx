@@ -29,7 +29,7 @@ export const TypographyH2 = ({
   return (
     <h2
       className={cn(
-        "scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 pb-2 text-3xl font-semibold tracking-tight",
         className,
       )}
     >
@@ -83,11 +83,7 @@ export const TypographyP = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return (
-    <p className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}>
-      {children}
-    </p>
-  );
+  return <p className={cn("leading-7", className)}>{children}</p>;
 };
 
 export const TypographyBlockquote = ({
@@ -98,7 +94,7 @@ export const TypographyBlockquote = ({
   className?: string;
 }) => {
   return (
-    <blockquote className={cn("mt-6 border-l-2 pl-6 italic", className)}>
+    <blockquote className={cn("border-l-2 pl-6 italic", className)}>
       {children}
     </blockquote>
   );
