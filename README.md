@@ -1,14 +1,7 @@
 # Sales Management Dashboard
 
-## TODO
+This is a mid scale application to learn about NextJS 14 and the new React server patterns. The application is a dashboard where a simple store can manage their employees and track their sales and performance.
 
-- [x] Make it deploy `31.05.2024`
-- [x] Scaffold basic UI with mock data `04.06.2024`
-- [x] Tidy up build process `04.06.2024`
-- [x] Set up database `04.06.2024`
-- [x] Attach database to UI `28.06.2024`
-- [x] Add authentication
-- [ ] Error management
-- [ ] Add rest of the features
-- [ ] Analytics
-- [ ] Rate limiting
+## Next TODO
+
+Add update user feature with robust authorization to make sure only the user can update their own data.
