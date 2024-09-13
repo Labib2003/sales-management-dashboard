@@ -24,6 +24,8 @@ import {
   TypographyP,
 } from "~/components/ui/typography";
 import { getUserById } from "~/server/queries/user.queries";
+import UpdateUserModal from "../UpdateUserModal";
+import UpdateUserInfoModal from "./UpdateUserInfoModal";
 
 const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
   const userData = await getUserById(params.id);
@@ -78,9 +80,7 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
                   <Badge className="uppercase">{userData.role}</Badge>
                 </div>
 
-                <Button size={"icon"} variant={"ghost"}>
-                  <Pencil2Icon />
-                </Button>
+                <UpdateUserInfoModal />
               </div>
               <TypographyP className="pe-10">
                 <span className="flex items-center gap-3">
