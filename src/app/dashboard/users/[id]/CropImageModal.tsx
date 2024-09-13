@@ -14,6 +14,7 @@ import Cropper, { type ReactCropperElement } from "react-cropper";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { TypographyP } from "~/components/ui/typography";
+import "cropperjs/dist/cropper.css";
 
 const CropImageModal = ({
   croppedImage,

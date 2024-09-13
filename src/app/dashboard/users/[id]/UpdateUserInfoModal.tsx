@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import "cropperjs/dist/cropper.css";
 import { useState } from "react";
 import CropImageModal from "./CropImageModal";
 import { TypographyP } from "~/components/ui/typography";
