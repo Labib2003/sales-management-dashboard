@@ -12,11 +12,7 @@ import {
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { validateRequest } from "~/lib/validateRequest";
-
-type Response = {
-  success: boolean;
-  message: string;
-};
+import { type Response } from "../types";
 
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
@@ -104,11 +100,15 @@ export async function updateUser(
   if (["superadmin", "admin"].includes(user?.role ?? "")) {
     const { role } = parsedData.data;
     updateData = { role };
-  } else if (user?.id === userId) {
+  }
+
+  if (user?.id === userId) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { role, ...data } = parsedData.data;
     updateData = data;
   } else return { success: false, message: "Unauthorized" };
+
+  console.log(updateData);
 
   try {
     await db.update(users).set(updateData).where(eq(users.id, userId));

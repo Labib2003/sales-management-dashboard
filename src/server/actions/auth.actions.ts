@@ -8,11 +8,7 @@ import { lucia } from "~/lib/lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { validateRequest } from "~/lib/validateRequest";
-
-type Response = {
-  success: boolean;
-  message: string;
-};
+import { type Response } from "../types";
 
 export async function login(
   email: string,

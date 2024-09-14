@@ -13,7 +13,7 @@ import {
 import Cropper, { type ReactCropperElement } from "react-cropper";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { TypographyP } from "~/components/ui/typography";
+import { TypographyLead } from "~/components/ui/typography";
 import "cropperjs/dist/cropper.css";
 
 const CropImageModal = ({
@@ -28,12 +28,18 @@ const CropImageModal = ({
 
   return (
     <Dialog>
-      <DialogTrigger className="w-fit p-0">
-        <TypographyP>Profile Picture:</TypographyP>
-        <div className="relative w-fit overflow-hidden">
-          <Image src={croppedImage} height={100} width={100} alt={``} />
+      <DialogTrigger className="w-full pe-5 text-left">
+        <TypographyLead className="mb-3">Profile Picture:</TypographyLead>
+        <div className="relative overflow-hidden">
+          <Image
+            src={croppedImage}
+            height={100}
+            width={100}
+            alt={``}
+            className="w-full rounded"
+          />
 
-          <div className="absolute inset-0 grid cursor-pointer place-items-center bg-black/15 transition-all hover:scale-125">
+          <div className="absolute inset-0 grid origin-center cursor-pointer place-items-center bg-black/15 transition-all hover:scale-125">
             <Pencil2Icon className="text-white" height={28} width={28} />
           </div>
         </div>

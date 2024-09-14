@@ -2,7 +2,6 @@ import {
   ChatBubbleIcon,
   EnvelopeClosedIcon,
   HomeIcon,
-  Pencil2Icon,
 } from "@radix-ui/react-icons";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +15,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import {
   TypographyH3,
@@ -24,7 +22,6 @@ import {
   TypographyP,
 } from "~/components/ui/typography";
 import { getUserById } from "~/server/queries/user.queries";
-import UpdateUserModal from "../UpdateUserModal";
 import UpdateUserInfoModal from "./UpdateUserInfoModal";
 
 const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
@@ -80,7 +77,7 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
                   <Badge className="uppercase">{userData.role}</Badge>
                 </div>
 
-                <UpdateUserInfoModal />
+                <UpdateUserInfoModal userData={userData} />
               </div>
               <TypographyP className="pe-10">
                 <span className="flex items-center gap-3">
