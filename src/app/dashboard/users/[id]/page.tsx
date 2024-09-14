@@ -23,9 +23,11 @@ import {
 } from "~/components/ui/typography";
 import { getUserById } from "~/server/queries/user.queries";
 import UpdateUserInfoModal from "./UpdateUserInfoModal";
+import { getCurrentUser } from "~/server/actions/auth.actions";
 
 const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
   const userData = await getUserById(params.id);
+  const currentUser = await getCurrentUser();
 
   if (!userData) return "User not found";
 
@@ -77,7 +79,9 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
                   <Badge className="uppercase">{userData.role}</Badge>
                 </div>
 
-                <UpdateUserInfoModal userData={userData} />
+                {currentUser?.id === userData.id && (
+                  <UpdateUserInfoModal userData={userData} />
+                )}
               </div>
               <TypographyP className="pe-10">
                 <span className="flex items-center gap-3">

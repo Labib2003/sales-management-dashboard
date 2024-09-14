@@ -13,6 +13,7 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { validateRequest } from "~/lib/validateRequest";
 import { type Response } from "../types";
+import transporter from "~/lib/nodemailer";
 
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
@@ -24,7 +25,6 @@ export async function createUser(
   const parsedData = createUserSchema.safeParse(data);
 
   if (!parsedData.success) return { success: false, message: "Invalid data" };
-  console.log(parsedData.data);
 
   try {
     const initialPassword = crypto.randomUUID().split("-")[0]!;
@@ -36,23 +36,23 @@ export async function createUser(
       password: hashedPassword,
     });
 
-    // const mailOptions = {
-    //   from: process.env.GMAIL_EMAIL,
-    //   to: parsedData.data.email,
-    //   subject: "Your New Auto-Generated Password",
-    //   html: `
-    //     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    //       <h2 style="color: #4CAF50;">Welcome!</h2>
-    //       <p>Your new account has been successfully created. Below is your auto-generated password:</p>
-    //       <p style="font-size: 16px; font-weight: bold; color: #333;">${initialPassword}</p>
-    //       <p>For security reasons, we strongly recommend that you change this password to a custom one as soon as possible.</p>
-    //       <p>If you have any questions or need further assistance, please don't hesitate to contact our support team.</p>
-    //       <p>Best regards,</p>
-    //       <p>Your Company Name</p>
-    //     </div>
-    //   `,
-    // };
-    // await transporter.sendMail(mailOptions);
+    const mailOptions = {
+      from: process.env.GMAIL_EMAIL,
+      to: parsedData.data.email,
+      subject: "Your New Auto-Generated Password",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color: #4CAF50;">Welcome!</h2>
+          <p>Your new account has been successfully created. Below is your auto-generated password:</p>
+          <p style="font-size: 16px; font-weight: bold; color: #333;">${initialPassword}</p>
+          <p>For security reasons, we strongly recommend that you change this password to a custom one as soon as possible.</p>
+          <p>If you have any questions or need further assistance, please don't hesitate to contact our support team.</p>
+          <p>Best regards,</p>
+          <p>Your Company Name</p>
+        </div>
+      `,
+    };
+    await transporter.sendMail(mailOptions);
 
     revalidatePath("/dashboard/users");
   } catch (error) {
@@ -107,8 +107,6 @@ export async function updateUser(
     const { role, ...data } = parsedData.data;
     updateData = data;
   } else return { success: false, message: "Unauthorized" };
-
-  console.log(updateData);
 
   try {
     await db.update(users).set(updateData).where(eq(users.id, userId));

@@ -1,7 +1,7 @@
 "use server";
 
 import { env } from "~/env";
-import axios, { type AxiosResponse, type AxiosError } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { type Response } from "../types";
 
 export async function uploadIoImgBB(base64Image: string): Promise<Response> {
