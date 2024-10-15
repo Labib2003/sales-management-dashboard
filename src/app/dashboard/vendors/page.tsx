@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { TypographyH3 } from "~/components/ui/typography";
+import CreateVendorModal from "./CreateVendorModal";
 
 const Vendors = () => {
   return (
@@ -30,7 +31,9 @@ const Vendors = () => {
           <TypographyH3>User/Employee List</TypographyH3>
         </div>
 
-        <div className="flex gap-2"></div>
+        <div>
+          <CreateVendorModal />
+        </div>
       </header>
     </div>
   );
