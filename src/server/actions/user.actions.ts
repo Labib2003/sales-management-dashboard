@@ -1,10 +1,8 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { type z } from "zod";
 import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
 import {
   createUserSchema,
   updateUserSchema,
@@ -30,10 +28,12 @@ export async function createUser(
     const initialPassword = crypto.randomUUID().split("-")[0]!;
     const hashedPassword = await bcrypt.hash(initialPassword, 10);
 
-    await db.insert(users).values({
-      ...parsedData.data,
-      id: crypto.randomUUID(),
-      password: hashedPassword,
+    await db.smd_User.create({
+      data: {
+        ...parsedData.data,
+        id: crypto.randomUUID(),
+        password: hashedPassword,
+      },
     });
 
     const mailOptions = {
@@ -76,7 +76,10 @@ export async function deleteUser(userId: string): Promise<Response> {
     return { success: false, message: "Unauthorized" };
 
   try {
-    await db.update(users).set({ active: false }).where(eq(users.id, userId));
+    await db.smd_User.update({
+      where: { id: userId },
+      data: { active: false },
+    });
     revalidatePath("/dashboard/users");
     return { success: true, message: "User deleted" };
   } catch (error) {
@@ -97,19 +100,17 @@ export async function updateUser(
   if (!parsedData.success) return { success: false, message: "Invalid data" };
   let updateData: Record<string, unknown> = {};
 
-  if (["superadmin", "admin"].includes(user?.role ?? "")) {
-    const { role } = parsedData.data;
-    updateData = { role };
-  }
-
   if (user?.id === userId) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { role, ...data } = parsedData.data;
     updateData = data;
+  } else if (["superadmin", "admin"].includes(user?.role ?? "")) {
+    const { role } = parsedData.data;
+    updateData = { role };
   } else return { success: false, message: "Unauthorized" };
 
   try {
-    await db.update(users).set(updateData).where(eq(users.id, userId));
+    await db.smd_User.update({ where: { id: userId }, data: updateData });
     revalidatePath("/dashboard/users");
     return { success: true, message: "User updated" };
   } catch (error) {

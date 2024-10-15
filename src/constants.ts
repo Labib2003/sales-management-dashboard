@@ -3,4 +3,5 @@ export const userRoles = [
   "manager",
   "admin",
   "superadmin",
+  "guest",
 ] as const;

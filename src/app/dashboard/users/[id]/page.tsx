@@ -62,7 +62,7 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
             <div className="flex items-center">
               <Image
                 src={
-                  userData?.profilePicture ??
+                  userData?.profile_picture ??
                   "/assets/images/profile_picture_placeholder.jpg"
                 }
                 height={100}

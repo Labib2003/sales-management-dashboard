@@ -1,10 +1,9 @@
 import "server-only";
 
 import { db } from "../db";
-import { users } from "../db/schema";
-import { and, count, desc, eq, ilike, or } from "drizzle-orm";
+import { type Prisma, type smd_User } from "@prisma/client";
 
-type UserField = keyof typeof users.$inferSelect;
+type UserField = keyof smd_User;
 
 type GetUserArgs = {
   page?: number;
@@ -17,36 +16,45 @@ export async function getUsers(arg: GetUserArgs) {
 
   const searchableFields: UserField[] = ["name", "email"];
 
-  const searchConditions = or(
-    ...searchableFields.map((field) => ilike(users[field], `%${search}%`)),
+  const searchConditions: Prisma.smd_UserWhereInput[] = searchableFields.map(
+    (field) => {
+      return {
+        [field]: {
+          contains: search,
+          mode: "insensitive",
+        },
+      };
+    },
   );
-  const filterConditions = and(
-    eq(users.active, true),
-    ...Object.entries(rest).map(([key, value]) => {
-      if (value) return eq(users[key as UserField], value);
+  const filterConditions: Prisma.smd_UserWhereInput[] = Object.entries(
+    rest,
+  ).map(([k, v]) => {
+    return { [k]: v };
+  });
+
+  const whereConditions: Prisma.smd_UserWhereInput = {
+    AND: [
+      { OR: searchConditions },
+      { AND: [{ active: true }, ...filterConditions] },
+    ],
+  };
+
+  const [total, data] = await Promise.all([
+    await db.smd_User.count({ where: whereConditions }),
+
+    await db.smd_User.findMany({
+      where: whereConditions,
+      skip: (Math.max(1, page) - 1) * limit,
+      take: limit,
+      orderBy: { created_at: "desc" },
     }),
-  );
-
-  const [[total], data] = await Promise.all([
-    await db
-      .select({ count: count() })
-      .from(users)
-      .where(eq(users.active, true)),
-
-    await db
-      .select()
-      .from(users)
-      .where(and(filterConditions, searchConditions))
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset((Math.max(1, page) - 1) * limit),
   ]);
 
-  return { total: total?.count ?? 0, data };
+  return { total, data };
 }
 
 export async function getUserById(id: string) {
-  const [user] = await db.select().from(users).where(eq(users.id, id));
+  const user = await db.smd_User.findUnique({ where: { id } });
 
   return user;
 }

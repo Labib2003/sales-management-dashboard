@@ -25,10 +25,10 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { type users } from "~/server/db/schema";
 import { uploadIoImgBB } from "~/server/actions/utils.actions";
 import { toast } from "sonner";
 import { updateUser } from "~/server/actions/user.actions";
+import { type smd_User } from "@prisma/client";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
@@ -36,14 +36,11 @@ const formSchema = z.object({
   address: z.string(),
 });
 
-const UpdateUserInfoModal = ({
-  userData,
-}: {
-  userData: typeof users.$inferSelect;
-}) => {
+const UpdateUserInfoModal = ({ userData }: { userData: smd_User }) => {
   const [open, setOpen] = useState(false);
   const croppedIMageInitialValue =
-    userData.profilePicture ?? "/assets/images/profile_picture_placeholder.jpg";
+    userData.profile_picture ??
+    "/assets/images/profile_picture_placeholder.jpg";
   const [croppedImage, setCroppedImage] = useState(croppedIMageInitialValue);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,7 +75,7 @@ const UpdateUserInfoModal = ({
       const res = await uploadIoImgBB(croppedImage);
       toast[res.success ? "success" : "error"](res.message);
 
-      if (res.success) data.profilePicture = res.data?.url as string;
+      if (res.success) data.profile_picture = res.data?.url as string;
     }
 
     const res = await updateUser(userData.id, data);

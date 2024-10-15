@@ -1,12 +1,6 @@
-import { drizzle } from "drizzle-orm/vercel-postgres";
-import { sql } from "@vercel/postgres";
-import * as schema from "./schema";
-import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+import { PrismaClient } from "@prisma/client";
+import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 
-export const db = drizzle(sql, { schema });
+export const db = new PrismaClient();
 
-export const adapter = new DrizzlePostgreSQLAdapter(
-  db,
-  schema.sessions,
-  schema.users,
-);
+export const adapter = new PrismaAdapter(db.smd_Session, db.smd_User);

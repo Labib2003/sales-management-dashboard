@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// START: coaching center project
+enum cc_Roles {
+  admin
+  student
+}
+
+model cc_sessions {
+  id        String   @id(map: "cc_session_pkey")
+  userId    String
+  expiresAt DateTime
+  cc_users  cc_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model cc_users {
+  id          String        @id(map: "cc_user_pkey")
+  name        String
+  email       String        @unique
+  password    String
+  phone       String
+  verified    Boolean       @default(false)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime
+  role        cc_Roles      @default(student)
+  cc_sessions cc_sessions[]
+}
+
+// END: coaching center project
+
+// START: sales management dashboard project
+enum smd_Role {
+  guest
+  salesman
+  manager
+  admin
+  superadmin
+
+  @@map("smd_roles")
+}
+
+model smd_Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  smd_User  smd_User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("smd_sessions")
+}
+
+model smd_User {
+  id              String   @id
+  name            String
+  email           String   @unique()
+  password        String
+  phone           String?
+  address         String?
+  role            smd_Role
+  profile_picture String?
+  active          Boolean  @default(true)
+
+  smd_session smd_Session[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([email], map: "email_idx")
+  @@map("smd_users")
+}
+
+// END: sales management dashboard project

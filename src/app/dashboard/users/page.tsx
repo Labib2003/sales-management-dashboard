@@ -24,13 +24,13 @@ import {
 } from "~/components/ui/tooltip";
 import CreateUserModal from "./CreateUserModal";
 import { getUsers } from "~/server/queries/user.queries";
-import UpdateUserModal from "./UpdateUserModal";
 import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
 import Link from "next/link";
 import { buttonVariants } from "~/components/ui/button";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
+import UpdateUserRoleModal from "./UpdateUserRoleModal";
 
 export default async function Users({
   searchParams,
@@ -99,18 +99,22 @@ export default async function Users({
                 <TableCell className="uppercase">{user.role}</TableCell>
                 <TableCell>
                   {user.address ? (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <p className="max-w-[12ch] truncate">
-                            {user.address}
-                          </p>
-                        </TooltipTrigger>
-                        <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                          <p>{user.address}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    user.address.length > 10 ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="max-w-[12ch] truncate">
+                              {user.address}
+                            </p>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
+                            <p>{user.address}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      user.address
+                    )
                   ) : (
                     "N/A"
                   )}
@@ -126,7 +130,7 @@ export default async function Users({
                   >
                     <EyeOpenIcon />
                   </Link>
-                  <UpdateUserModal user={user} />
+                  <UpdateUserRoleModal user={user} />
                   <DeleteUserModal userId={user.id} />
                 </TableCell>
               </TableRow>

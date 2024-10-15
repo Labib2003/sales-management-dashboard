@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type smd_User } from "@prisma/client";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,14 +33,9 @@ import {
 } from "~/components/ui/select";
 import { userRoles } from "~/constants";
 import { updateUser } from "~/server/actions/user.actions";
-import { type users } from "~/server/db/schema";
 import { updateUserSchema } from "~/validators/user.validators";
 
-const UpdateUserRoleModal = ({
-  user,
-}: {
-  user: Omit<typeof users.$inferSelect, "password">;
-}) => {
+const UpdateUserRoleModal = ({ user }: { user: smd_User }) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
@@ -53,7 +49,6 @@ const UpdateUserRoleModal = ({
     toast[res.success ? "success" : "error"](res.message);
     if (res.success) {
       setOpen(false);
-      form.reset();
     }
   }
 
