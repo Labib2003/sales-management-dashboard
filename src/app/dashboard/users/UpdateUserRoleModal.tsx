@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil2Icon } from "@radix-ui/react-icons";
+import { type smd_User } from "@prisma/client";
+import { SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -32,14 +33,9 @@ import {
 } from "~/components/ui/select";
 import { userRoles } from "~/constants";
 import { updateUser } from "~/server/actions/user.actions";
-import { type users } from "~/server/db/schema";
 import { updateUserSchema } from "~/validators/user.validators";
 
-const UpdateUserModal = ({
-  user,
-}: {
-  user: Omit<typeof users.$inferSelect, "password">;
-}) => {
+const UpdateUserRoleModal = ({ user }: { user: smd_User }) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
@@ -51,16 +47,13 @@ const UpdateUserModal = ({
   async function onSubmit(values: z.infer<typeof updateUserSchema>) {
     const res = await updateUser(user.id, values);
     toast[res.success ? "success" : "error"](res.message);
-    if (res.success) {
-      setOpen(false);
-      form.reset();
-    }
+    if (res.success) setOpen(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={(v) => setOpen(v)}>
       <DialogTrigger className={buttonVariants({ size: "icon" })}>
-        <Pencil2Icon />
+        <SquarePenIcon />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -107,4 +100,4 @@ const UpdateUserModal = ({
   );
 };
 
-export default UpdateUserModal;
+export default UpdateUserRoleModal;

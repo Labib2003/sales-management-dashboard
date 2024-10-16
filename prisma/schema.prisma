@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// START: coaching center project
+enum cc_Roles {
+  admin
+  student
+}
+
+model cc_sessions {
+  id        String   @id(map: "cc_session_pkey")
+  userId    String
+  expiresAt DateTime
+  cc_users  cc_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model cc_users {
+  id          String        @id(map: "cc_user_pkey")
+  name        String
+  email       String        @unique
+  password    String
+  phone       String
+  verified    Boolean       @default(false)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime
+  role        cc_Roles      @default(student)
+  cc_sessions cc_sessions[]
+}
+
+// END: coaching center project
+
+// START: sales management dashboard project
+enum smd_Role {
+  guest
+  salesman
+  manager
+  admin
+  superadmin
+
+  @@map("smd_roles")
+}
+
+model smd_Session {
+  id String @id
+
+  userId    String
+  expiresAt DateTime
+  smd_User  smd_User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("smd_sessions")
+}
+
+model smd_User {
+  id String @id
+
+  name            String
+  email           String   @unique()
+  password        String
+  phone           String?
+  address         String?
+  role            smd_Role
+  profile_picture String?
+  active          Boolean  @default(true)
+
+  sessions smd_Session[]
+
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  smd_Invoice smd_Invoice[]
+
+  @@index([email], map: "email_idx")
+  @@map("smd_users")
+}
+
+model smd_Vendor {
+  id String @id
+
+  name     String
+  address  String
+  email    String
+  active   Boolean       @default(true)
+  products smd_Product[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_vendors")
+}
+
+model smd_Category {
+  id String @id
+
+  name String
+
+  products smd_Product[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_categories")
+}
+
+model smd_Product {
+  id String @id
+
+  name        String
+  description String
+  package     String
+  unit        String?
+  img         String?
+  category_id String
+  vendor_id   String
+
+  category smd_Category       @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  vendor   smd_Vendor         @relation(fields: [vendor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  prices   smd_ProductPrice[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_products")
+}
+
+model smd_ProductPrice {
+  id String @id
+
+  package_price Int
+  unit_price    Int?
+  product_id    String
+
+  product         smd_Product       @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoice_history smd_InvoiceItem[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_product_prices")
+}
+
+model smd_InvoiceItem {
+  id String @id
+
+  product_price_id String
+  invoice_id       String
+  package_quantity Int    @default(0)
+  unit_quantity    Int    @default(0)
+
+  product_price smd_ProductPrice @relation(fields: [product_price_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoice       smd_Invoice      @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_invoice_items")
+}
+
+model smd_Invoice {
+  id String @id
+
+  items         smd_InvoiceItem[]
+  created_by_id String
+
+  created_by smd_User @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("smd_invoices")
+}
+
+// END: sales management dashboard project

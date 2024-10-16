@@ -5,12 +5,7 @@ import { type ImperativePanelHandle } from "react-resizable-panels";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { ResizablePanel, ResizablePanelGroup } from "~/components/ui/resizable";
 import styles from "./dashboard.module.css";
-import {
-  DashboardIcon,
-  DoubleArrowLeftIcon,
-  HamburgerMenuIcon,
-  PersonIcon,
-} from "@radix-ui/react-icons";
+import { DoubleArrowLeftIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +17,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { type users } from "~/server/db/schema";
 import {
   Popover,
   PopoverContent,
@@ -31,16 +25,22 @@ import {
 import { logout } from "~/server/actions/auth.actions";
 import { TypographyP, TypographySmall } from "~/components/ui/typography";
 import { Badge } from "~/components/ui/badge";
+import { type smd_User } from "@prisma/client";
+import {
+  ShoppingCartIcon,
+  UserRoundIcon,
+  LayoutDashboardIcon,
+} from "lucide-react";
 
 export default function SidebarWrapper({
   children,
   currentUser,
 }: {
   children: React.ReactNode;
-  currentUser: typeof users.$inferSelect;
+  currentUser: smd_User;
 }) {
   const sidebarRef = useRef<ImperativePanelHandle>(null);
-  const currentSegment = usePathname().split("/").pop();
+  const currentSegment = usePathname().split("/");
 
   const sidebarLinks = (
     <>
@@ -48,25 +48,40 @@ export default function SidebarWrapper({
         href={"/dashboard"}
         className={cn(
           buttonVariants({
-            variant: currentSegment === "dashboard" ? "default" : "outline",
+            variant:
+              currentSegment[currentSegment.length - 1] === "dashboard"
+                ? "default"
+                : "outline",
           }),
           "w-full justify-start space-x-3 border-none",
         )}
       >
-        <DashboardIcon />
+        <LayoutDashboardIcon />
         <span>Dashboard</span>
       </Link>
       <Link
         href={"/dashboard/users"}
         className={cn(
           buttonVariants({
-            variant: currentSegment === "users" ? "default" : "outline",
+            variant: currentSegment.includes("users") ? "default" : "outline",
           }),
           "w-full justify-start space-x-3 border-none",
         )}
       >
-        <PersonIcon />
+        <UserRoundIcon />
         <span>Users</span>
+      </Link>
+      <Link
+        href={"/dashboard/vendors"}
+        className={cn(
+          buttonVariants({
+            variant: currentSegment.includes("vendors") ? "default" : "outline",
+          }),
+          "w-full justify-start space-x-3 border-none",
+        )}
+      >
+        <ShoppingCartIcon />
+        <span>Vendors</span>
       </Link>
 
       <div className="flex-grow" />
@@ -81,7 +96,7 @@ export default function SidebarWrapper({
         >
           <div>
             <Avatar className="h-[2rem] w-[2rem]">
-              <AvatarImage src={currentUser.profilePicture ?? ""} />
+              <AvatarImage src={currentUser.profile_picture ?? ""} />
               <AvatarFallback className="dark bg-primary">
                 {currentUser.name
                   .split(" ")
@@ -92,7 +107,7 @@ export default function SidebarWrapper({
           </div>
           <span>{currentUser.name}</span>
         </PopoverTrigger>
-        <PopoverContent className="dark">
+        <PopoverContent className="dark space-y-2">
           <TypographyP className="mb-3">
             <span className="flex items-center justify-between">
               {currentUser.name}
@@ -100,6 +115,12 @@ export default function SidebarWrapper({
             </span>
             <TypographySmall>{currentUser.email}</TypographySmall>
           </TypographyP>
+          <Link
+            href={`/dashboard/users/${currentUser.id}`}
+            className={buttonVariants({ className: "w-full" })}
+          >
+            My Profile
+          </Link>
           <Button className="w-full" onClick={() => logout()}>
             Log Out
           </Button>

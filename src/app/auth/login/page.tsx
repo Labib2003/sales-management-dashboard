@@ -42,7 +42,7 @@ export default function Login() {
         <form
           onSubmit={form.handleSubmit(async (data) => {
             const res = await login(data.email, data.password);
-            if (res?.success === false) toast.error(res?.message);
+            if (res?.success === false) return toast.error(res?.message);
             window.location.reload();
           })}
           className="space-y-8"

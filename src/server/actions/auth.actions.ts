@@ -1,27 +1,18 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { users } from "../db/schema";
 import bcrypt from "bcrypt";
 import { lucia } from "~/lib/lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { validateRequest } from "~/lib/validateRequest";
-
-type Response = {
-  success: boolean;
-  message: string;
-};
+import { type Response } from "../types";
 
 export async function login(
   email: string,
   password: string,
 ): Promise<Response | undefined> {
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email.toLowerCase()));
+  const user = await db.smd_User.findUnique({ where: { email } });
   if (!user) return { success: false, message: "User not found" };
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) return { success: false, message: "Invalid password" };
@@ -39,16 +30,16 @@ export async function login(
 
 export const getCurrentUser = async () => {
   const { user } = await validateRequest();
-  const [currentUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, user?.id ?? ""));
+  if (!user) return null;
+
+  const currentUser = await db.smd_User.findUnique({
+    where: { id: user.id },
+  });
 
   return currentUser;
 };
 
 export async function logout() {
-  "use server";
   const { session } = await validateRequest();
   if (!session) return;
 

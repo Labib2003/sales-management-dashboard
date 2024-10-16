@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,6 +7,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import { TypographyH3 } from "~/components/ui/typography";
+import CreateVendorModal from "./CreateVendorModal";
 import {
   Table,
   TableBody,
@@ -14,25 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { TypographyH3 } from "~/components/ui/typography";
-import DeleteUserModal from "./DeleteUserModal";
+import { getVendors } from "~/server/queries/vendor.queries";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import CreateUserModal from "./CreateUserModal";
-import { getUsers } from "~/server/queries/user.queries";
 import HandlePagination from "~/components/custom/HandlePagination";
-import HandleSearch from "~/components/custom/HandleSearch";
-import HandleUserRoleFilter from "./HandleUserRoleFilter";
-import Link from "next/link";
-import { buttonVariants } from "~/components/ui/button";
-import UpdateUserRoleModal from "./UpdateUserRoleModal";
-import { EyeIcon } from "lucide-react";
+import DeleteVendorModal from "./DeleteVendorModal";
+import UpdateVendorModal from "./UpdateVendorModal";
 
-export default async function Users({
+const Vendors = async ({
   searchParams,
 }: {
   searchParams?: {
@@ -41,12 +37,11 @@ export default async function Users({
     search?: string;
     role?: string;
   };
-}) {
-  const { total, data: users } = await getUsers({
+}) => {
+  const { total, data: vendors } = await getVendors({
     page: parseInt(searchParams?.page ?? "1"),
     limit: parseInt(searchParams?.limit ?? "10"),
     search: searchParams?.search,
-    role: searchParams?.role,
   });
 
   return (
@@ -62,19 +57,15 @@ export default async function Users({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Users</BreadcrumbPage>
+                <BreadcrumbPage>Vendors</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <TypographyH3>User/Employee List</TypographyH3>
+          <TypographyH3>Vendor List</TypographyH3>
         </div>
 
-        <div className="flex gap-2">
-          <div className="grid grid-cols-2 gap-2">
-            <HandleUserRoleFilter />
-            <HandleSearch />
-          </div>
-          <CreateUserModal />
+        <div>
+          <CreateVendorModal />
         </div>
       </header>
 
@@ -83,55 +74,51 @@ export default async function Users({
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Role</TableHead>
               <TableHead>Address</TableHead>
+              <TableHead>Contact</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="capitalize">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone ?? "N/A"}</TableCell>
-                <TableCell className="uppercase">{user.role}</TableCell>
+            {vendors.map((vendor) => (
+              <TableRow key={vendor.id}>
+                <TableCell className="capitalize">{vendor.name}</TableCell>
+                <TableCell>{vendor.email}</TableCell>
                 <TableCell>
-                  {user.address ? (
-                    user.address.length > 10 ? (
+                  {vendor.address ? (
+                    vendor.address.length > 10 ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <p className="max-w-[12ch] truncate">
-                              {user.address}
+                              {vendor.address}
                             </p>
                           </TooltipTrigger>
                           <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                            <p>{user.address}</p>
+                            <p>{vendor.address}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      user.address
+                      vendor.address
                     )
                   ) : (
                     "N/A"
                   )}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
-                  <Link
-                    href={`/dashboard/users/${user.id}`}
-                    className={buttonVariants({
-                      size: "icon",
-                      variant: "outline",
-                      className: "hover:text-white",
-                    })}
-                  >
-                    <EyeIcon />
-                  </Link>
-                  <UpdateUserRoleModal user={user} />
-                  <DeleteUserModal userId={user.id} />
+                  {/* <Link */}
+                  {/*   href={`/dashboard/users/${vendor.id}`} */}
+                  {/*   className={buttonVariants({ */}
+                  {/*     size: "icon", */}
+                  {/*     variant: "outline", */}
+                  {/*     className: "hover:text-white", */}
+                  {/*   })} */}
+                  {/* > */}
+                  {/*   <EyeOpenIcon /> */}
+                  {/* </Link> */}
+                  <UpdateVendorModal vendor={vendor} />
+                  <DeleteVendorModal id={vendor.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -144,4 +131,6 @@ export default async function Users({
       </footer>
     </div>
   );
-}
+};
+
+export default Vendors;
