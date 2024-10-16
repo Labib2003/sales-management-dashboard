@@ -10,6 +10,7 @@ import {
 import { type Response } from "../types";
 import { db } from "../db";
 import { revalidatePath } from "next/cache";
+import { catchAcync } from "~/lib/utils";
 
 export async function createVendor(
   data: z.infer<typeof createVendorSchema>,
@@ -24,17 +25,11 @@ export async function createVendor(
 
   const id = randomUUID();
 
-  try {
+  return catchAcync(async () => {
     await db.smd_Vendor.create({ data: { id, ...parsedData.data } });
     revalidatePath("/dashboard/vendors");
     return { success: true, message: "Vendor created successfully" };
-  } catch (error) {
-    const castedError = error as Error;
-    return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
-    };
-  }
+  });
 }
 
 export async function deleteVendor(id: string): Promise<Response> {
@@ -43,20 +38,11 @@ export async function deleteVendor(id: string): Promise<Response> {
   if (!["superadmin", "admin"].includes(user?.role ?? ""))
     return { success: false, message: "Unauthorized" };
 
-  try {
+  return catchAcync(async () => {
     await db.smd_Vendor.update({ where: { id }, data: { active: false } });
     revalidatePath("/dashboard/vendors");
-    return {
-      success: true,
-      message: "Vendor deleted successfully",
-    };
-  } catch (error) {
-    const castedError = error as Error;
-    return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
-    };
-  }
+    return { success: true, message: "Vendor deleted successfully" };
+  });
 }
 
 export async function updateVendor(
@@ -71,15 +57,9 @@ export async function updateVendor(
   const parsedData = createVendorSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
-  try {
+  return catchAcync(async () => {
     await db.smd_Vendor.update({ where: { id }, data: parsedData.data });
     revalidatePath("/dashboard/vendors");
     return { success: true, message: "Vendor updated successfully" };
-  } catch (error) {
-    const castedError = error as Error;
-    return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
-    };
-  }
+  });
 }

@@ -12,6 +12,7 @@ import bcrypt from "bcrypt";
 import { validateRequest } from "~/lib/validateRequest";
 import { type Response } from "../types";
 import transporter from "~/lib/nodemailer";
+import { catchAcync } from "~/lib/utils";
 
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
@@ -23,7 +24,7 @@ export async function createUser(
   const parsedData = createUserSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
-  try {
+  return catchAcync(async () => {
     const initialPassword = crypto.randomUUID().split("-")[0]!;
     const hashedPassword = await bcrypt.hash(initialPassword, 10);
 
@@ -52,21 +53,13 @@ export async function createUser(
       `,
     };
     await transporter.sendMail(mailOptions);
-
     revalidatePath("/dashboard/users");
-  } catch (error) {
-    const castedError = error as Error;
     return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
+      success: true,
+      message:
+        "User created with auto generated password. The password is mailed to the user.",
     };
-  }
-
-  return {
-    success: true,
-    message:
-      "User created with auto generated password. The password is mailed to the user.",
-  };
+  });
 }
 
 export async function deleteUser(userId: string): Promise<Response> {
@@ -74,20 +67,14 @@ export async function deleteUser(userId: string): Promise<Response> {
   if (!["superadmin", "admin"].includes(user?.role ?? ""))
     return { success: false, message: "Unauthorized" };
 
-  try {
+  return catchAcync(async () => {
     await db.smd_User.update({
       where: { id: userId },
       data: { active: false },
     });
     revalidatePath("/dashboard/users");
     return { success: true, message: "User deleted" };
-  } catch (error) {
-    const castedError = error as Error;
-    return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
-    };
-  }
+  });
 }
 
 export async function updateUser(
@@ -108,15 +95,11 @@ export async function updateUser(
     updateData = { role };
   } else return { success: false, message: "Unauthorized" };
 
-  try {
+  console.log(updateData);
+
+  return catchAcync(async () => {
     await db.smd_User.update({ where: { id: userId }, data: updateData });
     revalidatePath("/dashboard/users");
     return { success: true, message: "User updated" };
-  } catch (error) {
-    const castedError = error as Error;
-    return {
-      success: false,
-      message: castedError.message ?? "An error occurred",
-    };
-  }
+  });
 }

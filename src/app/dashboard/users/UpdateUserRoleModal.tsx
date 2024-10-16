@@ -47,9 +47,7 @@ const UpdateUserRoleModal = ({ user }: { user: smd_User }) => {
   async function onSubmit(values: z.infer<typeof updateUserSchema>) {
     const res = await updateUser(user.id, values);
     toast[res.success ? "success" : "error"](res.message);
-    if (res.success) {
-      setOpen(false);
-    }
+    if (res.success) setOpen(false);
   }
 
   return (

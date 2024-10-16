@@ -38,7 +38,6 @@ const Vendors = async ({
     role?: string;
   };
 }) => {
-  console.log(searchParams?.limit);
   const { total, data: vendors } = await getVendors({
     page: parseInt(searchParams?.page ?? "1"),
     limit: parseInt(searchParams?.limit ?? "10"),
