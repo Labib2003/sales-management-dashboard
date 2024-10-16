@@ -3,7 +3,10 @@
 import { randomUUID } from "crypto";
 import { type z } from "zod";
 import { validateRequest } from "~/lib/validateRequest";
-import { createVendorSchema } from "~/validators/vendor.validators";
+import {
+  createVendorSchema,
+  type updateVendorSchema,
+} from "~/validators/vendor.validators";
 import { type Response } from "../types";
 import { db } from "../db";
 import { revalidatePath } from "next/cache";
@@ -47,6 +50,31 @@ export async function deleteVendor(id: string): Promise<Response> {
       success: true,
       message: "Vendor deleted successfully",
     };
+  } catch (error) {
+    const castedError = error as Error;
+    return {
+      success: false,
+      message: castedError.message ?? "An error occurred",
+    };
+  }
+}
+
+export async function updateVendor(
+  id: string,
+  data: z.infer<typeof updateVendorSchema>,
+): Promise<Response> {
+  // only admins can update vendors
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
+  const parsedData = createVendorSchema.safeParse(data);
+  if (!parsedData.success) return { success: false, message: "Invalid data" };
+
+  try {
+    await db.smd_Vendor.update({ where: { id }, data: parsedData.data });
+    revalidatePath("/dashboard/vendors");
+    return { success: true, message: "Vendor updated successfully" };
   } catch (error) {
     const castedError = error as Error;
     return {

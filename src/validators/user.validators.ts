@@ -8,8 +8,8 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-  name: z.string().optional(),
-  role: z.enum(userRoles, { message: "Invalid role" }).optional(),
+  name: z.string().min(1, { message: "Name is required" }),
+  role: z.enum(userRoles, { message: "Invalid role" }),
   profile_picture: z.string().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),

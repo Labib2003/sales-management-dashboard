@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/tooltip";
 import HandlePagination from "~/components/custom/HandlePagination";
 import DeleteVendorModal from "./DeleteVendorModal";
+import UpdateVendorModal from "./UpdateVendorModal";
 
 const Vendors = async ({
   searchParams,
@@ -117,7 +118,7 @@ const Vendors = async ({
                   {/* > */}
                   {/*   <EyeOpenIcon /> */}
                   {/* </Link> */}
-                  {/* <UpdateUserRoleModal user={vendor} /> */}
+                  <UpdateVendorModal vendor={vendor} />
                   <DeleteVendorModal id={vendor.id} />
                 </TableCell>
               </TableRow>
