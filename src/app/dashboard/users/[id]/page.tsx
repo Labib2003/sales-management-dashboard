@@ -58,21 +58,21 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
 
       <main>
         <Card className="max-w-screen-md px-5 py-5 ps-8">
-          <CardContent className="flex flex-col gap-10 p-0 md:flex-row">
+          <CardContent className="grid grid-cols-3 gap-10">
             <div className="flex items-center">
               <Image
                 src={
                   userData?.profile_picture ??
                   "/assets/images/profile_picture_placeholder.jpg"
                 }
-                height={100}
-                width={100}
+                height={500}
+                width={500}
                 alt={`profile picture of ${userData?.name}`}
-                className="w-full border"
+                className="w-full rounded border"
               />
             </div>
 
-            <div className="flex-grow">
+            <div className="col-span-2">
               <div className="mb-3 flex justify-between">
                 <div>
                   <TypographyLead>{userData.name}</TypographyLead>
@@ -84,18 +84,20 @@ const UserDetailsPage = async ({ params }: { params: { id: string } }) => {
                 )}
               </div>
               <TypographyP className="pe-10">
-                <span className="flex items-center gap-3">
+                <span className="flex items-baseline gap-3">
                   <EnvelopeClosedIcon />
                   <CopyButtonWrapper>{userData.email}</CopyButtonWrapper>
                 </span>
-                <span className="flex items-center gap-3">
+                <span className="flex items-baseline gap-3">
                   <ChatBubbleIcon />
                   <CopyButtonWrapper disabled={!userData.phone}>
                     {userData?.phone ?? "Phone number not available"}
                   </CopyButtonWrapper>
                 </span>
-                <span className="flex items-center gap-3">
-                  <HomeIcon />
+                <span className="flex items-baseline gap-3">
+                  <div>
+                    <HomeIcon />
+                  </div>
                   <CopyButtonWrapper disabled={!userData.address}>
                     {userData?.address ?? "Address not available"}
                   </CopyButtonWrapper>
