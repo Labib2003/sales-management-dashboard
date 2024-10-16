@@ -21,7 +21,6 @@ export async function createUser(
     return { success: false, message: "Unauthorized" };
 
   const parsedData = createUserSchema.safeParse(data);
-
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
   try {

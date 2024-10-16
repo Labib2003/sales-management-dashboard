@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type smd_User } from "@prisma/client";
-import { Pencil2Icon } from "@radix-ui/react-icons";
+import { SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ const UpdateUserRoleModal = ({ user }: { user: smd_User }) => {
   return (
     <Dialog open={open} onOpenChange={(v) => setOpen(v)}>
       <DialogTrigger className={buttonVariants({ size: "icon" })}>
-        <Pencil2Icon />
+        <SquarePenIcon />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

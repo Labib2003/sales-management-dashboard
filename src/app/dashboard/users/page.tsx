@@ -29,22 +29,22 @@ import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
 import Link from "next/link";
 import { buttonVariants } from "~/components/ui/button";
-import { EyeOpenIcon } from "@radix-ui/react-icons";
 import UpdateUserRoleModal from "./UpdateUserRoleModal";
+import { EyeIcon } from "lucide-react";
 
 export default async function Users({
   searchParams,
 }: {
   searchParams?: {
-    page?: number;
-    limit?: number;
+    page?: string;
+    limit?: string;
     search?: string;
     role?: string;
   };
 }) {
   const { total, data: users } = await getUsers({
-    page: searchParams?.page,
-    limit: searchParams?.limit,
+    page: parseInt(searchParams?.page ?? "1"),
+    limit: parseInt(searchParams?.limit ?? "10"),
     search: searchParams?.search,
     role: searchParams?.role,
   });
@@ -128,7 +128,7 @@ export default async function Users({
                       className: "hover:text-white",
                     })}
                   >
-                    <EyeOpenIcon />
+                    <EyeIcon />
                   </Link>
                   <UpdateUserRoleModal user={user} />
                   <DeleteUserModal userId={user.id} />

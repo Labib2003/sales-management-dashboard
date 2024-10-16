@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { toast } from "sonner";
+import { type z } from "zod";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Dialog,
@@ -21,16 +23,13 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  address: z.string().min(1, "Address is required"),
-  email: z.string().email(),
-});
+import { createVendor } from "~/server/actions/vendor.actions";
+import { createVendorSchema } from "~/validators/vendor.validators";
 
 const CreateVendorModal = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [open, setOpen] = useState(false);
+  const form = useForm<z.infer<typeof createVendorSchema>>({
+    resolver: zodResolver(createVendorSchema),
     defaultValues: {
       name: "",
       address: "",
@@ -38,12 +37,14 @@ const CreateVendorModal = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof createVendorSchema>) {
+    const res = await createVendor(values);
+    toast[res.success ? "success" : "error"](res.message);
+    if (res.success) setOpen(false);
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className={buttonVariants()}>Add Vendor</DialogTrigger>
 
       <DialogContent>

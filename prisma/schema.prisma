@@ -84,6 +84,7 @@ model smd_Vendor {
   name     String
   address  String
   email    String
+  active   Boolean       @default(true)
   products smd_Product[]
 
   created_at DateTime @default(now())

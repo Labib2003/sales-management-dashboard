@@ -1,5 +1,4 @@
 "use client";
-
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { Button, buttonVariants } from "~/components/ui/button";
@@ -13,9 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { deleteUser } from "~/server/actions/user.actions";
+import { deleteVendor } from "~/server/actions/vendor.actions";
 
-const DeleteUserModal = ({ userId }: { userId: string }) => {
+const DeleteVendorModal = ({ id }: { id: string }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,23 +28,23 @@ const DeleteUserModal = ({ userId }: { userId: string }) => {
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This will mark this user as inactive. The data will still persist in
-            our database in order to perserve any relationships with other
+            This will mark this vendor as inactive. The data will still persist
+            in our database in order to perserve any relationships with other
             entities.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+
+        <DialogFooter className="justify-end">
           <DialogClose asChild>
-            <Button type="button" variant="secondary" size={"sm"}>
-              Cancel
+            <Button type="button" variant="secondary">
+              Close
             </Button>
           </DialogClose>
           <Button
             type="button"
             variant="destructive"
-            size={"sm"}
             onClick={async () => {
-              const res = await deleteUser(userId);
+              const res = await deleteVendor(id);
               if (res.success) setOpen(false);
             }}
           >
@@ -57,4 +56,4 @@ const DeleteUserModal = ({ userId }: { userId: string }) => {
   );
 };
 
-export default DeleteUserModal;
+export default DeleteVendorModal;

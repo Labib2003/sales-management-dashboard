@@ -1,20 +1,20 @@
 import "server-only";
+import { type Prisma, type smd_Vendor } from "@prisma/client";
 import { db } from "../db";
-import { type Prisma, type smd_User } from "@prisma/client";
 
-type UserField = keyof smd_User;
+type VendorField = keyof smd_Vendor;
 type GetUserArgs = {
   page: number;
   limit: number;
   search?: string;
-} & Partial<Record<UserField, string | undefined>>;
+} & Partial<Record<VendorField, string | undefined>>;
 
-export async function getUsers(arg: GetUserArgs) {
+export async function getVendors(arg: GetUserArgs) {
   const { page, limit, search = "", ...rest } = arg;
 
-  const searchableFields: UserField[] = ["name", "email"];
+  const searchableFields: VendorField[] = ["name", "email"];
 
-  const searchConditions: Prisma.smd_UserWhereInput[] = searchableFields.map(
+  const searchConditions: Prisma.smd_VendorWhereInput[] = searchableFields.map(
     (field) => {
       return {
         [field]: {
@@ -24,13 +24,13 @@ export async function getUsers(arg: GetUserArgs) {
       };
     },
   );
-  const filterConditions: Prisma.smd_UserWhereInput[] = Object.entries(
+  const filterConditions: Prisma.smd_VendorWhereInput[] = Object.entries(
     rest,
   ).map(([k, v]) => {
     return { [k]: v };
   });
 
-  const whereConditions: Prisma.smd_UserWhereInput = {
+  const whereConditions: Prisma.smd_VendorWhereInput = {
     AND: [
       { OR: searchConditions },
       { AND: [{ active: true }, ...filterConditions] },
@@ -38,9 +38,9 @@ export async function getUsers(arg: GetUserArgs) {
   };
 
   const [total, data] = await Promise.all([
-    await db.smd_User.count({ where: whereConditions }),
+    await db.smd_Vendor.count({ where: whereConditions }),
 
-    await db.smd_User.findMany({
+    await db.smd_Vendor.findMany({
       where: whereConditions,
       skip: (Math.max(1, page) - 1) * limit,
       take: limit,
@@ -49,10 +49,4 @@ export async function getUsers(arg: GetUserArgs) {
   ]);
 
   return { total, data };
-}
-
-export async function getUserById(id: string) {
-  const user = await db.smd_User.findUnique({ where: { id } });
-
-  return user;
 }
