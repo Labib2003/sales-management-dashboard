@@ -30,6 +30,8 @@ import {
   ShoppingCartIcon,
   UserRoundIcon,
   LayoutDashboardIcon,
+  PackageIcon,
+  WarehouseIcon,
 } from "lucide-react";
 
 export default function SidebarWrapper({
@@ -80,8 +82,22 @@ export default function SidebarWrapper({
           "w-full justify-start space-x-3 border-none",
         )}
       >
-        <ShoppingCartIcon />
+        <WarehouseIcon />
         <span>Vendors</span>
+      </Link>
+      <Link
+        href={"/dashboard/products"}
+        className={cn(
+          buttonVariants({
+            variant: currentSegment.includes("products")
+              ? "default"
+              : "outline",
+          }),
+          "w-full justify-start space-x-3 border-none",
+        )}
+      >
+        <PackageIcon />
+        <span>Products</span>
       </Link>
 
       <div className="flex-grow" />

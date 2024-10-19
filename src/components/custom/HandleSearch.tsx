@@ -3,29 +3,29 @@
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { Input } from "../ui/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const HandleSearch = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  function debounce(fn: () => void, delay: number) {
-    let timer;
-    return (() => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(), delay);
-    })();
-  }
-
-  function handleSearch(term: string) {
+  useEffect(() => {
     const params = new URLSearchParams(searchParams);
     params.set("page", "1");
 
-    if (term) {
-      params.set("search", term);
+    if (searchTerm) {
+      params.set("search", searchTerm);
     } else params.delete("search");
-    debounce(() => router.replace(`${pathname}?${params.toString()}`), 100);
-  }
+
+    const x = setTimeout(
+      () => router.replace(`${pathname}?${params.toString()}`),
+      500,
+    );
+
+    return () => clearTimeout(x);
+  }, [searchTerm, pathname, router, searchParams]);
 
   return (
     <div className="relative">
@@ -38,7 +38,7 @@ const HandleSearch = () => {
         className="ps-8"
         placeholder="Search"
         defaultValue={searchParams.get("search") ?? ""}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
     </div>
   );

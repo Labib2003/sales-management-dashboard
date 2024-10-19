@@ -1,15 +1,16 @@
 import "server-only";
+
 import { type Prisma, type smd_Vendor } from "@prisma/client";
 import { db } from "../db";
 
 type VendorField = keyof smd_Vendor;
-type GetUserArgs = {
+type GetVendorArgs = {
   page: number;
   limit: number;
   search?: string;
 } & Partial<Record<VendorField, string | undefined>>;
 
-export async function getVendors(arg: GetUserArgs) {
+export async function getVendors(arg: GetVendorArgs) {
   const { page, limit, search = "", ...rest } = arg;
 
   const searchableFields: VendorField[] = ["name", "email"];

@@ -93,19 +93,6 @@ model smd_Vendor {
   @@map("smd_vendors")
 }
 
-model smd_Category {
-  id String @id
-
-  name String
-
-  products smd_Product[]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@map("smd_categories")
-}
-
 model smd_Product {
   id String @id
 
@@ -113,13 +100,10 @@ model smd_Product {
   description String
   package     String
   unit        String?
-  img         String?
-  category_id String
   vendor_id   String
 
-  category smd_Category       @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  vendor   smd_Vendor         @relation(fields: [vendor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  prices   smd_ProductPrice[]
+  vendor smd_Vendor         @relation(fields: [vendor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  prices smd_ProductPrice[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
