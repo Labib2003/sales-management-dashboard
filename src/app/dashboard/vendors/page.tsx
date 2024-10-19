@@ -27,6 +27,7 @@ import {
 import HandlePagination from "~/components/custom/HandlePagination";
 import DeleteVendorModal from "./DeleteVendorModal";
 import UpdateVendorModal from "./UpdateVendorModal";
+import HandleSearch from "~/components/custom/HandleSearch";
 
 const Vendors = async ({
   searchParams,
@@ -35,7 +36,6 @@ const Vendors = async ({
     page?: string;
     limit?: string;
     search?: string;
-    role?: string;
   };
 }) => {
   const { total, data: vendors } = await getVendors({
@@ -64,7 +64,8 @@ const Vendors = async ({
           <TypographyH3>Vendor List</TypographyH3>
         </div>
 
-        <div>
+        <div className="flex gap-2">
+          <HandleSearch />
           <CreateVendorModal />
         </div>
       </header>
