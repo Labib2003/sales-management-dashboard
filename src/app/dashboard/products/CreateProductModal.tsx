@@ -6,7 +6,8 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { toast } from "sonner";
+import { type z } from "zod";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Command,
@@ -39,55 +40,18 @@ import {
 } from "~/components/ui/popover";
 import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
-
-const formSchema = z
-  .object({
-    name: z.string().min(1, "Product name is required"),
-    description: z.string().min(1, "Product description is required"),
-    package: z.string().min(1, "Package type is required"),
-    unit: z.string().optional(),
-    vendor_id: z.string().min(1, "Vendor is required"),
-    package_price: z.coerce
-      .number()
-      .min(1, "Package price cannot be 0 or negative"),
-    unit_price: z.coerce
-      .number()
-      .min(1, "Unit price cannot be 0 or negative")
-      .optional(),
-  })
-  .refine(
-    (values) => {
-      return (
-        (!!values.unit && !!values.unit_price) ||
-        (!values.unit && !values.unit_price)
-      );
-    },
-    {
-      message: "Both unit and unit price are required",
-      path: ["unit"],
-    },
-  )
-  .refine(
-    (values) => {
-      return (
-        (!!values.unit && !!values.unit_price) ||
-        (!values.unit && !values.unit_price)
-      );
-    },
-    {
-      message: "Both unit and unit price are required",
-      path: ["unit_price"],
-    },
-  );
+import { createProduct } from "~/server/actions/product.actions";
+import { createProductSchema } from "~/validators/product.validators";
 
 const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [vendorSearchTerm, setVendorSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof createProductSchema>>({
+    resolver: zodResolver(createProductSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -97,10 +61,19 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof createProductSchema>) {
+    const res = await createProduct({
+      ...values,
+      package_price: Math.floor(values.package_price * 100),
+      unit_price: values.unit_price
+        ? Math.floor(values.unit_price * 100)
+        : undefined,
+    });
+    toast[res.success ? "success" : "error"](res.message);
+    if (res.success) {
+      setOpen(false);
+      form.reset();
+    }
   }
 
   useEffect(() => {
@@ -118,7 +91,7 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
   }, [vendorSearchTerm, pathname, router, searchParams]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className={buttonVariants()}>Add product</DialogTrigger>
       <DialogContent>
         <DialogHeader>

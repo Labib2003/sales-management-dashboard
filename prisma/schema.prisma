@@ -101,6 +101,7 @@ model smd_Product {
   package     String
   unit        String?
   vendor_id   String
+  active      Boolean @default(true)
 
   vendor smd_Vendor         @relation(fields: [vendor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   prices smd_ProductPrice[]
