@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import HandlePagination from "~/components/custom/HandlePagination";
+import HandleSearch from "~/components/custom/HandleSearch";
 
 const Products = async ({
   searchParams,
@@ -68,7 +69,8 @@ const Products = async ({
           <TypographyH3>Product List</TypographyH3>
         </div>
 
-        <div>
+        <div className="flex gap-2">
+          <HandleSearch />
           <CreateProductModal vendors={vendors.data} />
         </div>
       </header>
