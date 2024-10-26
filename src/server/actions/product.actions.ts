@@ -7,10 +7,16 @@ import { catchAcync } from "~/lib/utils";
 import { db } from "../db";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
+import { validateRequest } from "~/lib/validateRequest";
 
 export async function createProduct(
   data: z.infer<typeof createProductSchema>,
 ): Promise<Response> {
+  // only admins can create products
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
   const parsedData = createProductSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
