@@ -81,6 +81,7 @@ const Products = async ({
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Vendor</TableHead>
               <TableHead>Package</TableHead>
               <TableHead>Package Price</TableHead>
               <TableHead>Unit</TableHead>
@@ -110,6 +111,7 @@ const Products = async ({
                     product.description
                   )}
                 </TableCell>
+                <TableCell>{product.vendor.name}</TableCell>
                 <TableCell>{product.package}</TableCell>
                 <TableCell>
                   {product.prices[0]?.package_price

@@ -46,6 +46,7 @@ export async function getProducts(arg: GetProductsArgs) {
       orderBy: { created_at: "desc" },
       include: {
         prices: { orderBy: { created_at: "desc" }, take: 1 },
+        vendor: true,
       },
     }),
   ]);
