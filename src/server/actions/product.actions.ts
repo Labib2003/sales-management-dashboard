@@ -42,3 +42,16 @@ export async function createProduct(
     return { success: true, message: "Product created successfully" };
   });
 }
+
+export async function deleteProduct(id: string): Promise<Response> {
+  // only admins can delete products
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
+  return catchAcync(async () => {
+    await db.smd_Product.update({ where: { id }, data: { active: false } });
+    revalidatePath("/dashboard/products");
+    return { success: true, message: "Product deleted successfully" };
+  });
+}
