@@ -28,6 +28,7 @@ import {
 import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import DeleteProductModal from "./DeleteProductModal";
+import UpdateProductModal from "./UpdateProductModal";
 
 const Products = async ({
   searchParams,
@@ -136,8 +137,10 @@ const Products = async ({
                   {/* > */}
                   {/*   <EyeOpenIcon /> */}
                   {/* </Link> */}
-                  {/* <UpdateVendorModal vendor={product} /> */}
-                  {/* <DeleteVendorModal id={product.id} /> */}
+                  <UpdateProductModal
+                    vendors={vendors.data}
+                    product={product}
+                  />
                   <DeleteProductModal productId={product.id} />
                 </TableCell>
               </TableRow>
