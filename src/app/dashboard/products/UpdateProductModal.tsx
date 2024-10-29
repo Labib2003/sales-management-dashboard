@@ -52,13 +52,14 @@ const UpdateProductModal = ({
   product,
 }: {
   vendors: smd_Vendor[];
-  product: smd_Product & { prices: smd_ProductPrice[] };
+  product: smd_Product & { prices: smd_ProductPrice[]; vendor: smd_Vendor };
 }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [vendorSearchTerm, setVendorSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const form = useForm<z.infer<typeof productValidationSchema>>({
     resolver: zodResolver(productValidationSchema),
@@ -100,10 +101,17 @@ const UpdateProductModal = ({
     }, 500);
 
     return () => clearTimeout(searchVendors);
-  }, [vendorSearchTerm, pathname, router, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vendorSearchTerm, pathname, router]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setPopoverOpen(false);
+        setTimeout(() => setOpen(isOpen), 0);
+      }}
+    >
       <DialogTrigger className={buttonVariants({ size: "icon" })}>
         <SquarePenIcon />
       </DialogTrigger>
@@ -148,7 +156,11 @@ const UpdateProductModal = ({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Vendor *</FormLabel>
-                  <Popover modal>
+                  <Popover
+                    open={popoverOpen}
+                    onOpenChange={setPopoverOpen}
+                    modal
+                  >
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -161,10 +173,14 @@ const UpdateProductModal = ({
                           )}
                         >
                           {field.value
-                            ? vendors
-                              .map((v) => ({ label: v.name, value: v.id }))
-                              .find((vendor) => vendor.value === field.value)
-                              ?.label
+                            ? [
+                              ...vendors,
+                              {
+                                id: product.vendor.id,
+                                name: product.vendor.name,
+                              },
+                            ].find((vendor) => vendor.id === field.value)
+                              ?.name
                             : "Select vendor"}
                           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -180,7 +196,13 @@ const UpdateProductModal = ({
                         <CommandList>
                           <CommandEmpty>No vendors matched.</CommandEmpty>
                           <CommandGroup>
-                            {vendors.map((vendor) => (
+                            {[
+                              {
+                                id: product.vendor.id,
+                                name: product.vendor.name,
+                              },
+                              ...vendors,
+                            ].map((vendor) => (
                               <CommandItem
                                 value={vendor.name}
                                 key={vendor.id}

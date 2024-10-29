@@ -41,7 +41,7 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
 import { createProduct } from "~/server/actions/product.actions";
-import { createProductSchema } from "~/validators/product.validators";
+import { productValidationSchema } from "~/validators/product.validators";
 
 const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
   const router = useRouter();
@@ -49,9 +49,10 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
   const searchParams = useSearchParams();
   const [vendorSearchTerm, setVendorSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof createProductSchema>>({
-    resolver: zodResolver(createProductSchema),
+  const form = useForm<z.infer<typeof productValidationSchema>>({
+    resolver: zodResolver(productValidationSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -61,7 +62,7 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof createProductSchema>) {
+  async function onSubmit(values: z.infer<typeof productValidationSchema>) {
     const res = await createProduct({
       ...values,
       package_price: Math.floor(values.package_price * 100),
@@ -88,10 +89,17 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
     );
 
     return () => clearTimeout(searchVendors);
-  }, [vendorSearchTerm, pathname, router, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vendorSearchTerm, pathname, router]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setPopoverOpen(false);
+        setTimeout(() => setOpen(isOpen), 0);
+      }}
+    >
       <DialogTrigger className={buttonVariants()}>Add product</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -134,7 +142,11 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Vendor *</FormLabel>
-                  <Popover modal>
+                  <Popover
+                    open={popoverOpen}
+                    onOpenChange={setPopoverOpen}
+                    modal
+                  >
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -166,28 +178,26 @@ const CreateProductModal = ({ vendors }: { vendors: smd_Vendor[] }) => {
                         <CommandList>
                           <CommandEmpty>No vendors matched.</CommandEmpty>
                           <CommandGroup>
-                            {vendors
-                              .map((v) => ({ label: v.name, value: v.id }))
-                              .map((vendor) => (
-                                <CommandItem
-                                  value={vendor.value}
-                                  key={vendor.value}
-                                  onSelect={() => {
-                                    form.setValue("vendor_id", vendor.value);
-                                  }}
-                                  onClick={console.log}
-                                >
-                                  {vendor.label}
-                                  <CheckIcon
-                                    className={cn(
-                                      "ml-auto h-4 w-4",
-                                      vendor.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0",
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
+                            {vendors.map((vendor) => (
+                              <CommandItem
+                                value={vendor.name}
+                                key={vendor.id}
+                                onSelect={() => {
+                                  form.setValue("vendor_id", vendor.id);
+                                }}
+                                onClick={console.log}
+                              >
+                                {vendor.name}
+                                <CheckIcon
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    vendor.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
