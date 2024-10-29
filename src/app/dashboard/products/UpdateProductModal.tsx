@@ -44,8 +44,8 @@ import {
 } from "~/components/ui/popover";
 import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
-import { createProduct } from "~/server/actions/product.actions";
-import { createProductSchema } from "~/validators/product.validators";
+import { updateProduct } from "~/server/actions/product.actions";
+import { productValidationSchema } from "~/validators/product.validators";
 
 const UpdateProductModal = ({
   vendors,
@@ -60,8 +60,8 @@ const UpdateProductModal = ({
   const [vendorSearchTerm, setVendorSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof createProductSchema>>({
-    resolver: zodResolver(createProductSchema),
+  const form = useForm<z.infer<typeof productValidationSchema>>({
+    resolver: zodResolver(productValidationSchema),
     defaultValues: {
       name: product.name,
       description: product.description,
@@ -75,20 +75,18 @@ const UpdateProductModal = ({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof createProductSchema>) {
-    // const res = await createProduct({
-    //   ...values,
-    //   package_price: Math.floor(values.package_price * 100),
-    //   unit_price: values.unit_price
-    //     ? Math.floor(values.unit_price * 100)
-    //     : undefined,
-    // });
-    // toast[res.success ? "success" : "error"](res.message);
-    // if (res.success) {
-    //   setOpen(false);
-    //   form.reset();
-    // }
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof productValidationSchema>) {
+    const res = await updateProduct(product.id, {
+      ...values,
+      package_price: Math.floor(values.package_price * 100),
+      unit_price: values.unit_price
+        ? Math.floor(values.unit_price * 100)
+        : undefined,
+    });
+    toast[res.success ? "success" : "error"](res.message);
+    if (res.success) {
+      setOpen(false);
+    }
   }
 
   useEffect(() => {

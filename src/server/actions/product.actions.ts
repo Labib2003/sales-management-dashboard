@@ -2,7 +2,7 @@
 
 import { type z } from "zod";
 import { type Response } from "../types";
-import { createProductSchema } from "~/validators/product.validators";
+import { productValidationSchema } from "~/validators/product.validators";
 import { catchAcync } from "~/lib/utils";
 import { db } from "../db";
 import { randomUUID } from "crypto";
@@ -10,14 +10,14 @@ import { revalidatePath } from "next/cache";
 import { validateRequest } from "~/lib/validateRequest";
 
 export async function createProduct(
-  data: z.infer<typeof createProductSchema>,
+  data: z.infer<typeof productValidationSchema>,
 ): Promise<Response> {
   // only admins can create products
   const { user } = await validateRequest();
   if (!["superadmin", "admin"].includes(user?.role ?? ""))
     return { success: false, message: "Unauthorized" };
 
-  const parsedData = createProductSchema.safeParse(data);
+  const parsedData = productValidationSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
   return catchAcync(async () => {
@@ -53,5 +53,31 @@ export async function deleteProduct(id: string): Promise<Response> {
     await db.smd_Product.update({ where: { id }, data: { active: false } });
     revalidatePath("/dashboard/products");
     return { success: true, message: "Product deleted successfully" };
+  });
+}
+
+export async function updateProduct(
+  id: string,
+  data: z.infer<typeof productValidationSchema>,
+): Promise<Response> {
+  // only admins can update products
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
+  const parsedData = productValidationSchema.safeParse(data);
+  if (!parsedData.success) return { success: false, message: "Invalid data" };
+  const { package_price, unit_price, ...rest } = parsedData.data;
+
+  return catchAcync(async () => {
+    const productPriceId = randomUUID();
+    await db.$transaction(async (tx) => {
+      await tx.smd_Product.update({ where: { id }, data: rest });
+      await tx.smd_ProductPrice.create({
+        data: { id: productPriceId, product_id: id, package_price, unit_price },
+      });
+    });
+    revalidatePath("/dashboard/products");
+    return { success: true, message: "Product updated successfully" };
   });
 }
