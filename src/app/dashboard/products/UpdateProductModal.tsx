@@ -97,10 +97,9 @@ const UpdateProductModal = ({
     if (vendorSearchTerm) params.set("vendor-search", vendorSearchTerm);
     else params.delete("vendor-search");
 
-    const searchVendors = setTimeout(
-      () => router.replace(`${pathname}?${params.toString()}`),
-      500,
-    );
+    const searchVendors = setTimeout(() => {
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 500);
 
     return () => clearTimeout(searchVendors);
   }, [vendorSearchTerm, pathname, router, searchParams]);
@@ -183,28 +182,25 @@ const UpdateProductModal = ({
                         <CommandList>
                           <CommandEmpty>No vendors matched.</CommandEmpty>
                           <CommandGroup>
-                            {vendors
-                              .map((v) => ({ label: v.name, value: v.id }))
-                              .map((vendor) => (
-                                <CommandItem
-                                  value={vendor.value}
-                                  key={vendor.value}
-                                  onSelect={() => {
-                                    form.setValue("vendor_id", vendor.value);
-                                  }}
-                                  onClick={console.log}
-                                >
-                                  {vendor.label}
-                                  <CheckIcon
-                                    className={cn(
-                                      "ml-auto h-4 w-4",
-                                      vendor.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0",
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
+                            {vendors.map((vendor) => (
+                              <CommandItem
+                                value={vendor.name}
+                                key={vendor.id}
+                                onSelect={() => {
+                                  form.setValue("vendor_id", vendor.id);
+                                }}
+                              >
+                                {vendor.name}
+                                <CheckIcon
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    vendor.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
