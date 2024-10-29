@@ -148,8 +148,11 @@ model smd_InvoiceItem {
 model smd_Invoice {
   id String @id
 
-  items         smd_InvoiceItem[]
-  created_by_id String
+  customer_name    String
+  customer_contact String
+  customer_address String
+  items            smd_InvoiceItem[]
+  created_by_id    String
 
   created_by smd_User @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
