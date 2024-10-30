@@ -5,7 +5,6 @@ import { type Response } from "../types";
 import { productValidationSchema } from "~/validators/product.validators";
 import { catchAcync } from "~/lib/utils";
 import { db } from "../db";
-import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { validateRequest } from "~/lib/validateRequest";
 
@@ -23,14 +22,10 @@ export async function createProduct(
   return catchAcync(async () => {
     const { package_price, unit_price, ...rest } = parsedData.data;
 
-    const id = randomUUID();
-    const priceId = randomUUID();
-
     await db.$transaction(async (tx) => {
-      const product = await tx.smd_Product.create({ data: { id, ...rest } });
+      const product = await tx.smd_Product.create({ data: { ...rest } });
       return await tx.smd_ProductPrice.create({
         data: {
-          id: priceId,
           product_id: product.id,
           package_price,
           unit_price,
@@ -70,11 +65,10 @@ export async function updateProduct(
   const { package_price, unit_price, ...rest } = parsedData.data;
 
   return catchAcync(async () => {
-    const productPriceId = randomUUID();
     await db.$transaction(async (tx) => {
       await tx.smd_Product.update({ where: { id }, data: rest });
       await tx.smd_ProductPrice.create({
-        data: { id: productPriceId, product_id: id, package_price, unit_price },
+        data: { product_id: id, package_price, unit_price },
       });
     });
     revalidatePath("/dashboard/products");

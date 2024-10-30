@@ -27,11 +27,11 @@ import { TypographyP, TypographySmall } from "~/components/ui/typography";
 import { Badge } from "~/components/ui/badge";
 import { type smd_User } from "@prisma/client";
 import {
-  ShoppingCartIcon,
   UserRoundIcon,
   LayoutDashboardIcon,
   PackageIcon,
   WarehouseIcon,
+  ShoppingCartIcon,
 } from "lucide-react";
 
 export default function SidebarWrapper({
@@ -98,6 +98,20 @@ export default function SidebarWrapper({
       >
         <PackageIcon />
         <span>Products</span>
+      </Link>
+      <Link
+        href={"/dashboard/invoices"}
+        className={cn(
+          buttonVariants({
+            variant: currentSegment.includes("invoices")
+              ? "default"
+              : "outline",
+          }),
+          "w-full justify-start space-x-3 border-none",
+        )}
+      >
+        <ShoppingCartIcon />
+        <span>Invoices</span>
       </Link>
 
       <div className="flex-grow" />

@@ -31,7 +31,6 @@ export async function createUser(
     await db.smd_User.create({
       data: {
         ...parsedData.data,
-        id: crypto.randomUUID(),
         password: hashedPassword,
       },
     });

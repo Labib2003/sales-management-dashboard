@@ -47,7 +47,7 @@ enum smd_Role {
 }
 
 model smd_Session {
-  id String @id
+  id String @id @default(uuid())
 
   userId    String
   expiresAt DateTime
@@ -57,7 +57,7 @@ model smd_Session {
 }
 
 model smd_User {
-  id String @id
+  id String @id @default(uuid())
 
   name            String
   email           String   @unique()
@@ -79,7 +79,7 @@ model smd_User {
 }
 
 model smd_Vendor {
-  id String @id
+  id String @id @default(uuid())
 
   name     String
   address  String
@@ -94,7 +94,7 @@ model smd_Vendor {
 }
 
 model smd_Product {
-  id String @id
+  id String @id @default(uuid())
 
   name        String
   description String
@@ -113,7 +113,7 @@ model smd_Product {
 }
 
 model smd_ProductPrice {
-  id String @id
+  id String @id @default(uuid())
 
   package_price Int
   unit_price    Int?
@@ -129,7 +129,7 @@ model smd_ProductPrice {
 }
 
 model smd_InvoiceItem {
-  id String @id
+  id String @id @default(uuid())
 
   product_price_id String
   invoice_id       String
@@ -146,11 +146,11 @@ model smd_InvoiceItem {
 }
 
 model smd_Invoice {
-  id String @id
+  id String @id @default(uuid())
 
   customer_name    String
   customer_contact String
-  customer_address String
+  customer_address String?
   items            smd_InvoiceItem[]
   created_by_id    String
 
