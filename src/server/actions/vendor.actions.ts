@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { type z } from "zod";
 import { validateRequest } from "~/lib/validateRequest";
 import {
@@ -23,10 +22,8 @@ export async function createVendor(
   const parsedData = createVendorSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
 
-  const id = randomUUID();
-
   return catchAcync(async () => {
-    await db.smd_Vendor.create({ data: { id, ...parsedData.data } });
+    await db.smd_Vendor.create({ data: { ...parsedData.data } });
     revalidatePath("/dashboard/vendors");
     return { success: true, message: "Vendor created successfully" };
   });

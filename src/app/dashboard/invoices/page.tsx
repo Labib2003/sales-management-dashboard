@@ -1,4 +1,6 @@
 import Link from "next/link";
+import HandlePagination from "~/components/custom/HandlePagination";
+import HandleSearch from "~/components/custom/HandleSearch";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,8 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
-import { TypographyH3 } from "~/components/ui/typography";
-import CreateVendorModal from "./CreateVendorModal";
+import { buttonVariants } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,19 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { getVendors } from "~/server/queries/vendor.queries";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import HandlePagination from "~/components/custom/HandlePagination";
-import DeleteVendorModal from "./DeleteVendorModal";
-import UpdateVendorModal from "./UpdateVendorModal";
-import HandleSearch from "~/components/custom/HandleSearch";
+import { TypographyH3 } from "~/components/ui/typography";
+import { getInvoices } from "~/server/queries/invoice.queries";
 
-const Vendors = async ({
+const Invoices = async ({
   searchParams,
 }: {
   searchParams?: {
@@ -38,7 +36,7 @@ const Vendors = async ({
     search?: string;
   };
 }) => {
-  const { total, data: vendors } = await getVendors({
+  const { total, data: invoices } = await getInvoices({
     page: parseInt(searchParams?.page ?? "1"),
     limit: parseInt(searchParams?.limit ?? "10"),
     search: searchParams?.search,
@@ -57,16 +55,18 @@ const Vendors = async ({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Vendors</BreadcrumbPage>
+                <BreadcrumbPage>Invoices</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <TypographyH3>Vendor List</TypographyH3>
+          <TypographyH3>Invoice List</TypographyH3>
         </div>
 
         <div className="flex gap-2">
           <HandleSearch />
-          <CreateVendorModal />
+          <Link href="/dashboard/invoices/create" className={buttonVariants()}>
+            Create Invoice
+          </Link>
         </div>
       </header>
 
@@ -74,52 +74,38 @@ const Vendors = async ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Contact</TableHead>
+              <TableHead>Customer Name</TableHead>
+              <TableHead>Customer Contact</TableHead>
+              <TableHead>Customer Address</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendors.map((vendor) => (
-              <TableRow key={vendor.id}>
-                <TableCell className="capitalize">{vendor.name}</TableCell>
-                <TableCell>{vendor.email}</TableCell>
+            {invoices.map((invoice) => (
+              <TableRow key={invoice.id}>
+                <TableCell>{invoice.customer_name}</TableCell>
+                <TableCell>{invoice.customer_contact}</TableCell>
                 <TableCell>
-                  {vendor.address ? (
-                    vendor.address.length > 10 ? (
+                  {invoice.customer_address ? (
+                    invoice.customer_address.length > 10 ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <p className="max-w-[12ch] truncate">
-                              {vendor.address}
+                              {invoice.customer_address}
                             </p>
                           </TooltipTrigger>
                           <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                            <p>{vendor.address}</p>
+                            <p>{invoice.customer_address}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      vendor.address
+                      invoice.customer_address
                     )
                   ) : (
                     "N/A"
                   )}
-                </TableCell>
-                <TableCell className="space-x-2 text-center">
-                  {/* <Link */}
-                  {/*   href={`/dashboard/users/${vendor.id}`} */}
-                  {/*   className={buttonVariants({ */}
-                  {/*     size: "icon", */}
-                  {/*     variant: "outline", */}
-                  {/*     className: "hover:text-white", */}
-                  {/*   })} */}
-                  {/* > */}
-                  {/*   <EyeOpenIcon /> */}
-                  {/* </Link> */}
-                  <UpdateVendorModal vendor={vendor} />
-                  <DeleteVendorModal id={vendor.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -134,4 +120,4 @@ const Vendors = async ({
   );
 };
 
-export default Vendors;
+export default Invoices;
