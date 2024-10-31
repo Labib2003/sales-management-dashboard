@@ -33,7 +33,10 @@ export async function getInvoices(arg: GetInvoiceArgs) {
   });
 
   const whereConditions: Prisma.smd_InvoiceWhereInput = {
-    AND: [{ OR: searchConditions }, { AND: [...filterConditions] }],
+    AND: [
+      { OR: searchConditions },
+      { AND: [{ active: true }, ...filterConditions] },
+    ],
   };
 
   const [total, data] = await Promise.all([
@@ -44,6 +47,9 @@ export async function getInvoices(arg: GetInvoiceArgs) {
       skip: (Math.max(1, page) - 1) * limit,
       take: limit,
       orderBy: { created_at: "desc" },
+      include: {
+        items: { include: { product_price: { include: { product: true } } } },
+      },
     }),
   ]);
 

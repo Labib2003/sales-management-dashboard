@@ -35,3 +35,16 @@ export async function createInvoice(
     return { success: true, message: "Invoice created successfully" };
   });
 }
+
+export async function deleteInvoice(id: string): Promise<Response> {
+  // only admins can delete products
+  const { user } = await validateRequest();
+  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+    return { success: false, message: "Unauthorized" };
+
+  return catchAcync(async () => {
+    await db.smd_Invoice.update({ where: { id }, data: { active: false } });
+    revalidatePath("/dashboard/invoices");
+    return { success: true, message: "Invoice deleted successfully" };
+  });
+}

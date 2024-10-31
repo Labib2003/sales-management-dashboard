@@ -26,6 +26,8 @@ import {
 } from "~/components/ui/tooltip";
 import { TypographyH3 } from "~/components/ui/typography";
 import { getInvoices } from "~/server/queries/invoice.queries";
+import InvoiceDetailsModal from "./InvoiceDetailsModal";
+import DeleteInvoiceModal from "./DeleteInvoiceModal";
 
 const Invoices = async ({
   searchParams,
@@ -106,6 +108,10 @@ const Invoices = async ({
                   ) : (
                     "N/A"
                   )}
+                </TableCell>
+                <TableCell className="flex flex-wrap justify-center gap-2">
+                  <InvoiceDetailsModal items={invoice.items} />
+                  <DeleteInvoiceModal invoiceId={invoice.id} />
                 </TableCell>
               </TableRow>
             ))}

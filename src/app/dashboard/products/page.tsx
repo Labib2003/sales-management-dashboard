@@ -127,16 +127,6 @@ const Products = async ({
                     : "N/A"}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
-                  {/* <Link */}
-                  {/*   href={`/dashboard/users/${vendor.id}`} */}
-                  {/*   className={buttonVariants({ */}
-                  {/*     size: "icon", */}
-                  {/*     variant: "outline", */}
-                  {/*     className: "hover:text-white", */}
-                  {/*   })} */}
-                  {/* > */}
-                  {/*   <EyeOpenIcon /> */}
-                  {/* </Link> */}
                   <UpdateProductModal
                     vendors={vendors.data}
                     product={product}
