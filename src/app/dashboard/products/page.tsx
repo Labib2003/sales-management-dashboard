@@ -35,14 +35,16 @@ const Products = async ({
 }: {
   searchParams?: {
     "vendor-search"?: string;
+    "vendor-page"?: string;
+    "vendor-limit"?: string;
     page?: string;
     limit?: string;
     search?: string;
   };
 }) => {
   const vendors = await getVendors({
-    page: 1,
-    limit: 10,
+    page: parseInt(searchParams?.["vendor-page"] ?? "1"),
+    limit: parseInt(searchParams?.["vendor-limit"] ?? "10"),
     search: searchParams?.["vendor-search"],
   });
   const { total, data: products } = await getProducts({

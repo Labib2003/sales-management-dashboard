@@ -13,9 +13,9 @@ const HandleSearch = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", "1");
 
     if (searchTerm) {
+      params.set("page", "1");
       params.set("search", searchTerm);
     } else params.delete("search");
 
