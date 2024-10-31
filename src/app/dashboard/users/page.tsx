@@ -28,9 +28,8 @@ import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import HandleUserRoleFilter from "./HandleUserRoleFilter";
 import Link from "next/link";
-import { buttonVariants } from "~/components/ui/button";
 import UpdateUserRoleModal from "./UpdateUserRoleModal";
-import { EyeIcon } from "lucide-react";
+import UserDetailsModal from "./UserDetailsModal";
 
 export default async function Users({
   searchParams,
@@ -120,16 +119,7 @@ export default async function Users({
                   )}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
-                  <Link
-                    href={`/dashboard/users/${user.id}`}
-                    className={buttonVariants({
-                      size: "icon",
-                      variant: "outline",
-                      className: "hover:text-white",
-                    })}
-                  >
-                    <EyeIcon />
-                  </Link>
+                  <UserDetailsModal userData={user} />
                   <UpdateUserRoleModal user={user} />
                   <DeleteUserModal userId={user.id} />
                 </TableCell>
