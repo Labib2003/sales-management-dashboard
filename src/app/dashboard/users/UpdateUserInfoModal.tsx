@@ -1,6 +1,5 @@
 "use client";
 
-import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Dialog,
@@ -85,10 +84,8 @@ const UpdateUserInfoModal = ({ userData }: { userData: smd_User }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        className={buttonVariants({ variant: "ghost", size: "icon" })}
-      >
-        <Pencil2Icon />
+      <DialogTrigger className={buttonVariants({ className: "w-full" })}>
+        Update Profile
       </DialogTrigger>
 
       <DialogContent className="max-w-screen-md">

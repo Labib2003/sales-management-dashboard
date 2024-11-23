@@ -153,6 +153,7 @@ model smd_Invoice {
   customer_address String?
   items            smd_InvoiceItem[]
   created_by_id    String
+  active           Boolean           @default(true)
 
   created_by smd_User @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

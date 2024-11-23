@@ -33,6 +33,7 @@ import {
   WarehouseIcon,
   ShoppingCartIcon,
 } from "lucide-react";
+import UpdateUserInfoModal from "./users/UpdateUserInfoModal";
 
 export default function SidebarWrapper({
   children,
@@ -145,12 +146,7 @@ export default function SidebarWrapper({
             </span>
             <TypographySmall>{currentUser.email}</TypographySmall>
           </TypographyP>
-          <Link
-            href={`/dashboard/users/${currentUser.id}`}
-            className={buttonVariants({ className: "w-full" })}
-          >
-            My Profile
-          </Link>
+          <UpdateUserInfoModal userData={currentUser} />
           <Button className="w-full" onClick={() => logout()}>
             Log Out
           </Button>
