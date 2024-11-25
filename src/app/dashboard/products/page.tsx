@@ -29,6 +29,8 @@ import HandlePagination from "~/components/custom/HandlePagination";
 import HandleSearch from "~/components/custom/HandleSearch";
 import DeleteProductModal from "./DeleteProductModal";
 import UpdateProductModal from "./UpdateProductModal";
+import { EyeIcon } from "lucide-react";
+import { buttonVariants } from "~/components/ui/button";
 
 const Products = async ({
   searchParams,
@@ -129,6 +131,15 @@ const Products = async ({
                     : "N/A"}
                 </TableCell>
                 <TableCell className="space-x-2 text-center">
+                  <Link
+                    href={`/dashboard/products/${product.id}`}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "icon",
+                    })}
+                  >
+                    <EyeIcon />
+                  </Link>
                   <UpdateProductModal
                     vendors={vendors.data}
                     product={product}
