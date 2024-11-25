@@ -52,7 +52,6 @@ export async function getUsers(arg: GetUserArgs) {
               where: {
                 created_at: {
                   gte: new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days ago
-                  lte: new Date(), // current date and time
                 },
               },
             },
