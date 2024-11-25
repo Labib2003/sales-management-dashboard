@@ -45,6 +45,20 @@ export async function getUsers(arg: GetUserArgs) {
       skip: (Math.max(1, page) - 1) * limit,
       take: limit,
       orderBy: { created_at: "desc" },
+      include: {
+        _count: {
+          select: {
+            sales: {
+              where: {
+                created_at: {
+                  gte: new Date(new Date().setDate(new Date().getDate() - 7)), // 7 days ago
+                  lte: new Date(), // current date and time
+                },
+              },
+            },
+          },
+        },
+      },
     }),
   ]);
 

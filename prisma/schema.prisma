@@ -69,10 +69,10 @@ model smd_User {
   active          Boolean  @default(true)
 
   sessions smd_Session[]
+  sales    smd_Invoice[]
 
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
-  smd_Invoice smd_Invoice[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@index([email], map: "email_idx")
   @@map("smd_users")

@@ -86,6 +86,7 @@ export default async function Users({
               <TableHead>Phone</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Address</TableHead>
+              <TableHead>Sales This Week</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -118,6 +119,7 @@ export default async function Users({
                     "N/A"
                   )}
                 </TableCell>
+                <TableCell>{user._count.sales}</TableCell>
                 <TableCell className="space-x-2 text-center">
                   <UserDetailsModal userData={user} />
                   <UpdateUserRoleModal user={user} />
