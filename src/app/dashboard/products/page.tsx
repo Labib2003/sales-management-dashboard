@@ -30,57 +30,37 @@ import HandleSearch from "~/components/custom/HandleSearch";
 import DeleteProductModal from "./DeleteProductModal";
 import UpdateProductModal from "./UpdateProductModal";
 import { EyeIcon } from "lucide-react";
-import { buttonVariants } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
+import { Suspense } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
-const Products = async ({
+type SearchParams = {
+  "vendor-search"?: string;
+  "vendor-page"?: string;
+  "vendor-limit"?: string;
+  page?: string;
+  limit?: string;
+  search?: string;
+};
+
+const ProductsTable = async ({
   searchParams,
 }: {
-  searchParams?: {
-    "vendor-search"?: string;
-    "vendor-page"?: string;
-    "vendor-limit"?: string;
-    page?: string;
-    limit?: string;
-    search?: string;
-  };
+  searchParams?: SearchParams;
 }) => {
-  const vendors = await getVendors({
-    page: parseInt(searchParams?.["vendor-page"] ?? "1"),
-    limit: parseInt(searchParams?.["vendor-limit"] ?? "10"),
-    search: searchParams?.["vendor-search"],
-  });
   const { total, data: products } = await getProducts({
     page: parseInt(searchParams?.page ?? "1"),
     limit: parseInt(searchParams?.limit ?? "10"),
     search: searchParams?.search,
   });
+  const vendors = await getVendors({
+    page: parseInt(searchParams?.["vendor-page"] ?? "1"),
+    limit: parseInt(searchParams?.["vendor-limit"] ?? "10"),
+    search: searchParams?.["vendor-search"],
+  });
 
   return (
-    <div>
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Products</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <TypographyH3>Product List</TypographyH3>
-        </div>
-
-        <div className="flex gap-2">
-          <HandleSearch />
-          <CreateProductModal vendors={vendors.data} />
-        </div>
-      </header>
-
+    <>
       <main>
         <Table>
           <TableHeader>
@@ -151,10 +131,73 @@ const Products = async ({
           </TableBody>
         </Table>
       </main>
-
       <footer className="pt-5">
         <HandlePagination total={total} />
       </footer>
+    </>
+  );
+};
+
+const CreateProductModalWrapper = async ({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) => {
+  const vendors = await getVendors({
+    page: parseInt(searchParams?.["vendor-page"] ?? "1"),
+    limit: parseInt(searchParams?.["vendor-limit"] ?? "10"),
+    search: searchParams?.["vendor-search"],
+  });
+
+  return <CreateProductModal vendors={vendors.data} />;
+};
+
+const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
+  return (
+    <div>
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Products</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <TypographyH3>Product List</TypographyH3>
+        </div>
+
+        <div className="flex gap-2">
+          <HandleSearch />
+          <Suspense
+            fallback={
+              <Skeleton>
+                <Button className="opacity-0">Add Product</Button>
+              </Skeleton>
+            }
+          >
+            <CreateProductModalWrapper searchParams={searchParams} />
+          </Suspense>
+        </div>
+      </header>
+
+      <Suspense
+        fallback={
+          <div className="space-y-2">
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+          </div>
+        }
+      >
+        <ProductsTable searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 };
