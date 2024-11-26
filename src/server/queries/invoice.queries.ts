@@ -1,3 +1,4 @@
+import "server-only";
 import { type Prisma, type smd_Invoice } from "@prisma/client";
 import { db } from "../db";
 

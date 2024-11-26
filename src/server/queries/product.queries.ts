@@ -1,3 +1,4 @@
+import "server-only";
 import { type Prisma, type smd_Product } from "@prisma/client";
 import { db } from "../db";
 
@@ -52,4 +53,24 @@ export async function getProducts(arg: GetProductsArgs) {
   ]);
 
   return { total, data };
+}
+
+export async function getProductById(id: string) {
+  const user = await db.smd_Product.findUnique({
+    where: { id },
+    include: {
+      vendor: {
+        include: {
+          _count: { select: { products: { where: { active: true } } } },
+        },
+      },
+      prices: {
+        include: { invoice_history: true },
+        orderBy: { created_at: "desc" },
+        take: 10,
+      },
+    },
+  });
+
+  return user;
 }

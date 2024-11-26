@@ -28,8 +28,10 @@ import { TypographyH3 } from "~/components/ui/typography";
 import { getInvoices } from "~/server/queries/invoice.queries";
 import InvoiceDetailsModal from "./InvoiceDetailsModal";
 import DeleteInvoiceModal from "./DeleteInvoiceModal";
+import { Suspense } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
-const Invoices = async ({
+const InvoicesTable = async ({
   searchParams,
 }: {
   searchParams?: {
@@ -45,33 +47,7 @@ const Invoices = async ({
   });
 
   return (
-    <div>
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Invoices</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <TypographyH3>Invoice List</TypographyH3>
-        </div>
-
-        <div className="flex gap-2">
-          <HandleSearch />
-          <Link href="/dashboard/invoices/create" className={buttonVariants()}>
-            Create Invoice
-          </Link>
-        </div>
-      </header>
-
+    <>
       <main>
         <Table>
           <TableHeader>
@@ -118,10 +94,61 @@ const Invoices = async ({
           </TableBody>
         </Table>
       </main>
-
       <footer className="pt-5">
         <HandlePagination total={total} />
       </footer>
+    </>
+  );
+};
+
+const Invoices = async ({
+  searchParams,
+}: {
+  searchParams?: {
+    page?: string;
+    limit?: string;
+    search?: string;
+  };
+}) => {
+  return (
+    <div>
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Invoices</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <TypographyH3>Invoice List</TypographyH3>
+        </div>
+
+        <div className="flex gap-2">
+          <HandleSearch />
+          <Link href="/dashboard/invoices/create" className={buttonVariants()}>
+            Create Invoice
+          </Link>
+        </div>
+      </header>
+
+      <Suspense
+        fallback={
+          <div className="space-y-2">
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+          </div>
+        }
+      >
+        <InvoicesTable searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 };

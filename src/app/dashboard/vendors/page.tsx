@@ -28,8 +28,10 @@ import HandlePagination from "~/components/custom/HandlePagination";
 import DeleteVendorModal from "./DeleteVendorModal";
 import UpdateVendorModal from "./UpdateVendorModal";
 import HandleSearch from "~/components/custom/HandleSearch";
+import { Suspense } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
-const Vendors = async ({
+const VendorsTable = async ({
   searchParams,
 }: {
   searchParams?: {
@@ -44,6 +46,71 @@ const Vendors = async ({
     search: searchParams?.search,
   });
 
+  return (
+    <>
+      <main>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {vendors.map((vendor) => (
+              <TableRow key={vendor.id}>
+                <TableCell className="capitalize">{vendor.name}</TableCell>
+                <TableCell>
+                  {vendor.address ? (
+                    vendor.address.length > 10 ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="max-w-[12ch] truncate">
+                              {vendor.address}
+                            </p>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
+                            <p>{vendor.address}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      vendor.address
+                    )
+                  ) : (
+                    "N/A"
+                  )}
+                </TableCell>
+                <TableCell>{vendor.email}</TableCell>
+                <TableCell className="space-x-2 text-center">
+                  <UpdateVendorModal vendor={vendor} />
+                  <DeleteVendorModal id={vendor.id} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </main>
+
+      <footer className="pt-5">
+        <HandlePagination total={total} />
+      </footer>
+    </>
+  );
+};
+
+export default function Vendors({
+  searchParams,
+}: {
+  searchParams?: {
+    page?: string;
+    limit?: string;
+    search?: string;
+  };
+}) {
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -70,68 +137,17 @@ const Vendors = async ({
         </div>
       </header>
 
-      <main>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {vendors.map((vendor) => (
-              <TableRow key={vendor.id}>
-                <TableCell className="capitalize">{vendor.name}</TableCell>
-                <TableCell>{vendor.email}</TableCell>
-                <TableCell>
-                  {vendor.address ? (
-                    vendor.address.length > 10 ? (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <p className="max-w-[12ch] truncate">
-                              {vendor.address}
-                            </p>
-                          </TooltipTrigger>
-                          <TooltipContent className="w-[500px] bg-card text-foreground shadow-md">
-                            <p>{vendor.address}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ) : (
-                      vendor.address
-                    )
-                  ) : (
-                    "N/A"
-                  )}
-                </TableCell>
-                <TableCell className="space-x-2 text-center">
-                  {/* <Link */}
-                  {/*   href={`/dashboard/users/${vendor.id}`} */}
-                  {/*   className={buttonVariants({ */}
-                  {/*     size: "icon", */}
-                  {/*     variant: "outline", */}
-                  {/*     className: "hover:text-white", */}
-                  {/*   })} */}
-                  {/* > */}
-                  {/*   <EyeOpenIcon /> */}
-                  {/* </Link> */}
-                  <UpdateVendorModal vendor={vendor} />
-                  <DeleteVendorModal id={vendor.id} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </main>
-
-      <footer className="pt-5">
-        <HandlePagination total={total} />
-      </footer>
+      <Suspense
+        fallback={
+          <div className="space-y-2">
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+            <Skeleton className="h-[40px]" />
+          </div>
+        }
+      >
+        <VendorsTable searchParams={searchParams} />
+      </Suspense>
     </div>
   );
-};
-
-export default Vendors;
+}
