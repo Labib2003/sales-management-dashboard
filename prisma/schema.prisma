@@ -42,6 +42,7 @@ enum smd_Role {
   manager
   admin
   superadmin
+  demo
 
   @@map("smd_roles")
 }

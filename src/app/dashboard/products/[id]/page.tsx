@@ -24,7 +24,7 @@ const ProductDetails = async ({ params }: { params: { id: string } }) => {
   // salesman cannot access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+    !(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
       currentUser?.role ?? "guest",
     )
   )

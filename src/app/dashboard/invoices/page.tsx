@@ -92,9 +92,11 @@ const InvoicesTable = async ({
                 </TableCell>
                 <TableCell className="flex flex-wrap justify-center gap-2">
                   <InvoiceDetailsModal items={invoice.items} />
-                  {!(["superadmin", "admin", "manager"] as smd_Role[]).includes(
-                    currentUser?.role ?? "guest",
-                  ) && <DeleteInvoiceModal invoiceId={invoice.id} />}
+                  {(
+                    ["superadmin", "admin", "manager", "demo"] as smd_Role[]
+                  ).includes(currentUser?.role ?? "guest") && (
+                    <DeleteInvoiceModal invoiceId={invoice.id} />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -120,9 +122,9 @@ const Invoices = async ({
   // guests cannot access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
-      currentUser?.role ?? "guest",
-    )
+    !(
+      ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+    ).includes(currentUser?.role ?? "guest")
   )
     redirect("/dashboard");
 
@@ -148,9 +150,16 @@ const Invoices = async ({
 
         <div className="flex gap-2">
           <HandleSearch />
-          <Link href="/dashboard/invoices/create" className={buttonVariants()}>
-            Create Invoice
-          </Link>
+          {(
+            ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+          ).includes(currentUser?.role ?? "guest") && (
+            <Link
+              href="/dashboard/invoices/create"
+              className={buttonVariants()}
+            >
+              Create Invoice
+            </Link>
+          )}
         </div>
       </header>
 

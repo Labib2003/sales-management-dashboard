@@ -26,9 +26,9 @@ const CreateNewInvoice = async ({
   // guests cannot access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
-      currentUser?.role ?? "guest",
-    )
+    !(
+      ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+    ).includes(currentUser?.role ?? "guest")
   )
     redirect("/dashboard");
 

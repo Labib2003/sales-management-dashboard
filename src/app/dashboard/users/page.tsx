@@ -101,7 +101,7 @@ const UsersTable = async ({
                 <TableCell>{user._count.sales}</TableCell>
                 <TableCell className="space-x-2 text-center">
                   <UserDetailsModal userData={user} />
-                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                  {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
                     currentUser?.role ?? "guest",
                   ) && (
                     <>
@@ -136,7 +136,7 @@ export default async function Users({
   // only admins can access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin"] as smd_Role[]).includes(
+    !(["superadmin", "admin", "demo"] as smd_Role[]).includes(
       currentUser?.role ?? "guest",
     )
   )
@@ -167,7 +167,7 @@ export default async function Users({
             <HandleUserRoleFilter />
             <HandleSearch />
           </div>
-          {(["superadmin", "admin"] as smd_Role[]).includes(
+          {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
             currentUser?.role ?? "guest",
           ) && <CreateUserModal />}
         </div>

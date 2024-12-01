@@ -15,11 +15,14 @@ export async function createInvoice(
   // guests cannot create products
   const { user } = await validateRequest();
   if (
+    !user ||
     !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
       user?.role ?? "guest",
     )
   )
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = createInvoiceSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -46,6 +49,8 @@ export async function deleteInvoice(id: string): Promise<Response> {
   const { user } = await validateRequest();
   if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_Invoice.update({ where: { id }, data: { active: false } });

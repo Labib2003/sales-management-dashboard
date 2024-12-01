@@ -20,6 +20,8 @@ export async function createProduct(
     )
   )
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = productValidationSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -48,6 +50,8 @@ export async function deleteProduct(id: string): Promise<Response> {
   const { user } = await validateRequest();
   if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_Product.update({ where: { id }, data: { active: false } });
@@ -64,6 +68,8 @@ export async function updateProduct(
   const { user } = await validateRequest();
   if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = productValidationSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };

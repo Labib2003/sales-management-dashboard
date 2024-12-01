@@ -125,7 +125,7 @@ const ProductsTable = async ({
                   >
                     <EyeIcon />
                   </Link>
-                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                  {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
                     currentUser?.role ?? "guest",
                   ) && (
                     <>
@@ -167,9 +167,9 @@ const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
   // guests cannot access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
-      currentUser?.role ?? "guest",
-    )
+    !(
+      ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+    ).includes(currentUser?.role ?? "guest")
   )
     redirect("/dashboard");
 
@@ -195,7 +195,7 @@ const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
 
         <div className="flex gap-2">
           <HandleSearch />
-          {(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+          {(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
             currentUser?.role ?? "guest",
           ) && (
             <Suspense

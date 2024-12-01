@@ -91,7 +91,7 @@ const VendorsTable = async ({
                 </TableCell>
                 <TableCell>{vendor.email}</TableCell>
                 <TableCell className="space-x-2 text-center">
-                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                  {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
                     currentUser?.role ?? "guest",
                   ) && (
                     <>
@@ -125,7 +125,7 @@ export default async function Vendors({
   // only admins and managers can access this page
   const currentUser = await getCurrentUser();
   if (
-    !(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+    !(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
       currentUser?.role ?? "guest",
     )
   )
@@ -154,7 +154,7 @@ export default async function Vendors({
         <div className="flex gap-2">
           <HandleSearch />
 
-          {(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+          {(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
             currentUser?.role ?? "guest",
           ) && <CreateVendorModal />}
         </div>

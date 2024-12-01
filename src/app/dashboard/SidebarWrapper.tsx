@@ -63,7 +63,7 @@ export default function Sidebar({
         <span>Dashboard</span>
       </Link>
 
-      {(["superadmin", "admin"] as smd_Role[]).includes(
+      {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
         currentUser?.role ?? "guest",
       ) && (
         <Link
@@ -80,7 +80,7 @@ export default function Sidebar({
         </Link>
       )}
 
-      {(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+      {(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
         currentUser?.role ?? "guest",
       ) && (
         <Link
@@ -99,9 +99,9 @@ export default function Sidebar({
         </Link>
       )}
 
-      {(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
-        currentUser?.role ?? "guest",
-      ) && (
+      {(
+        ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+      ).includes(currentUser?.role ?? "guest") && (
         <Link
           href={"/dashboard/products"}
           className={cn(
@@ -118,9 +118,9 @@ export default function Sidebar({
         </Link>
       )}
 
-      {(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
-        currentUser?.role ?? "guest",
-      ) && (
+      {(
+        ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+      ).includes(currentUser?.role ?? "guest") && (
         <Link
           href={"/dashboard/invoices"}
           className={cn(
