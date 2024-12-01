@@ -30,15 +30,20 @@ import InvoiceDetailsModal from "./InvoiceDetailsModal";
 import DeleteInvoiceModal from "./DeleteInvoiceModal";
 import { Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { type smd_User, type smd_Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 const InvoicesTable = async ({
   searchParams,
+  currentUser,
 }: {
   searchParams?: {
     page?: string;
     limit?: string;
     search?: string;
   };
+  currentUser?: smd_User;
 }) => {
   const { total, data: invoices } = await getInvoices({
     page: parseInt(searchParams?.page ?? "1"),
@@ -87,7 +92,11 @@ const InvoicesTable = async ({
                 </TableCell>
                 <TableCell className="flex flex-wrap justify-center gap-2">
                   <InvoiceDetailsModal items={invoice.items} />
-                  <DeleteInvoiceModal invoiceId={invoice.id} />
+                  {(
+                    ["superadmin", "admin", "manager", "demo"] as smd_Role[]
+                  ).includes(currentUser?.role ?? "guest") && (
+                    <DeleteInvoiceModal invoiceId={invoice.id} />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -110,6 +119,15 @@ const Invoices = async ({
     search?: string;
   };
 }) => {
+  // guests cannot access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(
+      ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+    ).includes(currentUser?.role ?? "guest")
+  )
+    redirect("/dashboard");
+
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -132,9 +150,16 @@ const Invoices = async ({
 
         <div className="flex gap-2">
           <HandleSearch />
-          <Link href="/dashboard/invoices/create" className={buttonVariants()}>
-            Create Invoice
-          </Link>
+          {(
+            ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+          ).includes(currentUser?.role ?? "guest") && (
+            <Link
+              href="/dashboard/invoices/create"
+              className={buttonVariants()}
+            >
+              Create Invoice
+            </Link>
+          )}
         </div>
       </header>
 
@@ -147,7 +172,10 @@ const Invoices = async ({
           </div>
         }
       >
-        <InvoicesTable searchParams={searchParams} />
+        <InvoicesTable
+          searchParams={searchParams}
+          currentUser={currentUser ?? undefined}
+        />
       </Suspense>
     </div>
   );

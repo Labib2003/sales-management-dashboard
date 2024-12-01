@@ -7,14 +7,21 @@ import { catchAcync } from "~/lib/utils";
 import { db } from "../db";
 import { revalidatePath } from "next/cache";
 import { validateRequest } from "~/lib/validateRequest";
+import { type smd_Role } from "@prisma/client";
 
 export async function createProduct(
   data: z.infer<typeof productValidationSchema>,
 ): Promise<Response> {
-  // only admins can create products
+  // only admins and managers can create products
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (
+    !(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+      user?.role ?? "guest",
+    )
+  )
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = productValidationSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -39,10 +46,12 @@ export async function createProduct(
 }
 
 export async function deleteProduct(id: string): Promise<Response> {
-  // only admins can delete products
+  // only admins and managers can delete products
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_Product.update({ where: { id }, data: { active: false } });
@@ -55,10 +64,12 @@ export async function updateProduct(
   id: string,
   data: z.infer<typeof productValidationSchema>,
 ): Promise<Response> {
-  // only admins can update products
+  // only admins and managers can update products
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = productValidationSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };

@@ -13,13 +13,17 @@ import { validateRequest } from "~/lib/validateRequest";
 import { type Response } from "../types";
 import transporter from "~/lib/nodemailer";
 import { catchAcync } from "~/lib/utils";
+import { type smd_Role } from "@prisma/client";
 
 export async function createUser(
   data: z.infer<typeof createUserSchema>,
 ): Promise<Response> {
+  // only admins can create users
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = createUserSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -63,8 +67,10 @@ export async function createUser(
 
 export async function deleteUser(userId: string): Promise<Response> {
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_User.update({
@@ -81,6 +87,9 @@ export async function updateUser(
   data: z.infer<typeof updateUserSchema>,
 ): Promise<Response> {
   const { user } = await validateRequest();
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
+
   const parsedData = updateUserSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
   let updateData: Record<string, unknown> = {};
@@ -89,12 +98,12 @@ export async function updateUser(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { role, ...data } = parsedData.data;
     updateData = data;
-  } else if (["superadmin", "admin"].includes(user?.role ?? "")) {
+  } else if (
+    (["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest")
+  ) {
     const { role } = parsedData.data;
     updateData = { role };
   } else return { success: false, message: "Unauthorized" };
-
-  console.log(updateData);
 
   return catchAcync(async () => {
     await db.smd_User.update({ where: { id: userId }, data: updateData });

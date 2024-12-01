@@ -14,6 +14,12 @@ export async function login(
 ): Promise<Response | undefined> {
   const user = await db.smd_User.findUnique({ where: { email } });
   if (!user) return { success: false, message: "User not found" };
+  if (user.role === "guest")
+    return {
+      success: false,
+      message:
+        "No role assigned to the user yet. Contact an admin to get access",
+    };
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) return { success: false, message: "Invalid password" };
 

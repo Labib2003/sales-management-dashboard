@@ -1,5 +1,5 @@
 import "server-only";
-import { type Prisma, type smd_Invoice } from "@prisma/client";
+import type { Prisma, smd_Invoice } from "@prisma/client";
 import { db } from "../db";
 
 type InvoiceField = keyof smd_Invoice;

@@ -7,14 +7,22 @@ import { catchAcync } from "~/lib/utils";
 import { revalidatePath } from "next/cache";
 import { type z } from "zod";
 import { db } from "../db";
+import { type smd_Role } from "@prisma/client";
 
 export async function createInvoice(
   data: z.infer<typeof createInvoiceSchema>,
 ): Promise<Response> {
-  // only admins can create products
+  // guests cannot create products
   const { user } = await validateRequest();
-  if (!user || !["superadmin", "admin"].includes(user.role))
+  if (
+    !user ||
+    !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
+      user?.role ?? "guest",
+    )
+  )
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = createInvoiceSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -37,10 +45,12 @@ export async function createInvoice(
 }
 
 export async function deleteInvoice(id: string): Promise<Response> {
-  // only admins can delete products
+  // only admins and managers can delete invoices
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_Invoice.update({ where: { id }, data: { active: false } });

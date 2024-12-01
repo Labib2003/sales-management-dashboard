@@ -10,14 +10,17 @@ import { type Response } from "../types";
 import { db } from "../db";
 import { revalidatePath } from "next/cache";
 import { catchAcync } from "~/lib/utils";
+import { type smd_Role } from "@prisma/client";
 
 export async function createVendor(
   data: z.infer<typeof createVendorSchema>,
 ): Promise<Response> {
-  // only admins can create vendors
+  // only admins and managers can create vendors
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = createVendorSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };
@@ -32,8 +35,10 @@ export async function createVendor(
 export async function deleteVendor(id: string): Promise<Response> {
   // only admins can delete vendors
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   return catchAcync(async () => {
     await db.smd_Vendor.update({ where: { id }, data: { active: false } });
@@ -48,8 +53,10 @@ export async function updateVendor(
 ): Promise<Response> {
   // only admins can update vendors
   const { user } = await validateRequest();
-  if (!["superadmin", "admin"].includes(user?.role ?? ""))
+  if (!(["superadmin", "admin"] as smd_Role[]).includes(user?.role ?? "guest"))
     return { success: false, message: "Unauthorized" };
+  if (user?.role === "demo")
+    return { success: false, message: "Mutations are disabled for demo user" };
 
   const parsedData = createVendorSchema.safeParse(data);
   if (!parsedData.success) return { success: false, message: "Invalid data" };

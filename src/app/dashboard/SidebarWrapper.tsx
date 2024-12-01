@@ -25,7 +25,7 @@ import {
 import { logout } from "~/server/actions/auth.actions";
 import { TypographyP, TypographySmall } from "~/components/ui/typography";
 import { Badge } from "~/components/ui/badge";
-import { type smd_User } from "@prisma/client";
+import { type smd_Role, type smd_User } from "@prisma/client";
 import {
   UserRoundIcon,
   LayoutDashboardIcon,
@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import UpdateUserInfoModal from "./users/UpdateUserInfoModal";
 
-export default function SidebarWrapper({
+export default function Sidebar({
   children,
   currentUser,
 }: {
@@ -62,58 +62,80 @@ export default function SidebarWrapper({
         <LayoutDashboardIcon />
         <span>Dashboard</span>
       </Link>
-      <Link
-        href={"/dashboard/users"}
-        className={cn(
-          buttonVariants({
-            variant: currentSegment.includes("users") ? "default" : "outline",
-          }),
-          "w-full justify-start space-x-3 border-none",
-        )}
-      >
-        <UserRoundIcon />
-        <span>Users</span>
-      </Link>
-      <Link
-        href={"/dashboard/vendors"}
-        className={cn(
-          buttonVariants({
-            variant: currentSegment.includes("vendors") ? "default" : "outline",
-          }),
-          "w-full justify-start space-x-3 border-none",
-        )}
-      >
-        <WarehouseIcon />
-        <span>Vendors</span>
-      </Link>
-      <Link
-        href={"/dashboard/products"}
-        className={cn(
-          buttonVariants({
-            variant: currentSegment.includes("products")
-              ? "default"
-              : "outline",
-          }),
-          "w-full justify-start space-x-3 border-none",
-        )}
-      >
-        <PackageIcon />
-        <span>Products</span>
-      </Link>
-      <Link
-        href={"/dashboard/invoices"}
-        className={cn(
-          buttonVariants({
-            variant: currentSegment.includes("invoices")
-              ? "default"
-              : "outline",
-          }),
-          "w-full justify-start space-x-3 border-none",
-        )}
-      >
-        <ShoppingCartIcon />
-        <span>Invoices</span>
-      </Link>
+
+      {(["superadmin", "admin", "demo"] as smd_Role[]).includes(
+        currentUser?.role ?? "guest",
+      ) && (
+        <Link
+          href={"/dashboard/users"}
+          className={cn(
+            buttonVariants({
+              variant: currentSegment.includes("users") ? "default" : "outline",
+            }),
+            "w-full justify-start space-x-3 border-none",
+          )}
+        >
+          <UserRoundIcon />
+          <span>Users</span>
+        </Link>
+      )}
+
+      {(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
+        currentUser?.role ?? "guest",
+      ) && (
+        <Link
+          href={"/dashboard/vendors"}
+          className={cn(
+            buttonVariants({
+              variant: currentSegment.includes("vendors")
+                ? "default"
+                : "outline",
+            }),
+            "w-full justify-start space-x-3 border-none",
+          )}
+        >
+          <WarehouseIcon />
+          <span>Vendors</span>
+        </Link>
+      )}
+
+      {(
+        ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+      ).includes(currentUser?.role ?? "guest") && (
+        <Link
+          href={"/dashboard/products"}
+          className={cn(
+            buttonVariants({
+              variant: currentSegment.includes("products")
+                ? "default"
+                : "outline",
+            }),
+            "w-full justify-start space-x-3 border-none",
+          )}
+        >
+          <PackageIcon />
+          <span>Products</span>
+        </Link>
+      )}
+
+      {(
+        ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+      ).includes(currentUser?.role ?? "guest") && (
+        <Link
+          href={"/dashboard/invoices"}
+          className={cn(
+            buttonVariants({
+              variant: currentSegment.includes("invoices")
+                ? "default"
+                : "outline",
+            }),
+            "w-full justify-start space-x-3 border-none",
+          )}
+        >
+          <ShoppingCartIcon />
+          <span>Invoices</span>
+        </Link>
+      )}
 
       <div className="flex-grow" />
       <Popover>

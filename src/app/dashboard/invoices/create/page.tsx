@@ -10,6 +10,9 @@ import {
 } from "~/components/ui/breadcrumb";
 import CreateInvoiceForm from "./CreateInvoiceForm";
 import { getProducts } from "~/server/queries/product.queries";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { redirect } from "next/navigation";
+import { type smd_Role } from "@prisma/client";
 
 const CreateNewInvoice = async ({
   searchParams,
@@ -20,6 +23,15 @@ const CreateNewInvoice = async ({
     search?: string;
   };
 }) => {
+  // guests cannot access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(
+      ["superadmin", "admin", "manager", "salesman", "demo"] as smd_Role[]
+    ).includes(currentUser?.role ?? "guest")
+  )
+    redirect("/dashboard");
+
   const { total, data: products } = await getProducts({
     page: parseInt(searchParams?.page ?? "1"),
     limit: parseInt(searchParams?.limit ?? "10"),

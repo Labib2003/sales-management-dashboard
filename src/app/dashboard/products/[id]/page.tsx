@@ -16,8 +16,20 @@ import {
 } from "~/components/ui/typography";
 import { getProductById } from "~/server/queries/product.queries";
 import PriceHistoryChart from "./PriceHistoryChart";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { type smd_Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 const ProductDetails = async ({ params }: { params: { id: string } }) => {
+  // salesman cannot access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(["superadmin", "admin", "manager", "demo"] as smd_Role[]).includes(
+      currentUser?.role ?? "guest",
+    )
+  )
+    redirect("/dashboard");
+
   const product = await getProductById(params.id);
 
   return (
