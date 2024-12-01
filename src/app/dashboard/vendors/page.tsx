@@ -30,15 +30,20 @@ import UpdateVendorModal from "./UpdateVendorModal";
 import HandleSearch from "~/components/custom/HandleSearch";
 import { Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { type smd_User, type smd_Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 const VendorsTable = async ({
   searchParams,
+  currentUser,
 }: {
   searchParams?: {
     page?: string;
     limit?: string;
     search?: string;
   };
+  currentUser?: smd_User;
 }) => {
   const { total, data: vendors } = await getVendors({
     page: parseInt(searchParams?.page ?? "1"),
@@ -86,8 +91,14 @@ const VendorsTable = async ({
                 </TableCell>
                 <TableCell>{vendor.email}</TableCell>
                 <TableCell className="space-x-2 text-center">
-                  <UpdateVendorModal vendor={vendor} />
-                  <DeleteVendorModal id={vendor.id} />
+                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                    currentUser?.role ?? "guest",
+                  ) && (
+                    <>
+                      <UpdateVendorModal vendor={vendor} />
+                      <DeleteVendorModal id={vendor.id} />
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -102,7 +113,7 @@ const VendorsTable = async ({
   );
 };
 
-export default function Vendors({
+export default async function Vendors({
   searchParams,
 }: {
   searchParams?: {
@@ -111,6 +122,15 @@ export default function Vendors({
     search?: string;
   };
 }) {
+  // only admins and managers can access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+      currentUser?.role ?? "guest",
+    )
+  )
+    redirect("/dashboard");
+
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -133,7 +153,10 @@ export default function Vendors({
 
         <div className="flex gap-2">
           <HandleSearch />
-          <CreateVendorModal />
+
+          {(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+            currentUser?.role ?? "guest",
+          ) && <CreateVendorModal />}
         </div>
       </header>
 
@@ -146,7 +169,10 @@ export default function Vendors({
           </div>
         }
       >
-        <VendorsTable searchParams={searchParams} />
+        <VendorsTable
+          searchParams={searchParams}
+          currentUser={currentUser ?? undefined}
+        />
       </Suspense>
     </div>
   );

@@ -1,3 +1,4 @@
+import { type smd_Role } from "@prisma/client";
 import { Lucia } from "lucia";
 import { adapter } from "~/server/db";
 
@@ -26,5 +27,5 @@ declare module "lucia" {
 
 interface DatabaseUserAttributes {
   id: number;
-  role: string;
+  role: smd_Role;
 }

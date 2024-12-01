@@ -32,9 +32,13 @@ import UpdateUserRoleModal from "./UpdateUserRoleModal";
 import UserDetailsModal from "./UserDetailsModal";
 import { Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { type smd_User, type smd_Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 const UsersTable = async ({
   searchParams,
+  currentUser,
 }: {
   searchParams?: {
     page?: string;
@@ -42,6 +46,7 @@ const UsersTable = async ({
     search?: string;
     role?: string;
   };
+  currentUser?: smd_User;
 }) => {
   const { total, data: users } = await getUsers({
     page: parseInt(searchParams?.page ?? "1"),
@@ -96,8 +101,14 @@ const UsersTable = async ({
                 <TableCell>{user._count.sales}</TableCell>
                 <TableCell className="space-x-2 text-center">
                   <UserDetailsModal userData={user} />
-                  <UpdateUserRoleModal user={user} />
-                  <DeleteUserModal userId={user.id} />
+                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                    currentUser?.role ?? "guest",
+                  ) && (
+                    <>
+                      <UpdateUserRoleModal user={user} />
+                      <DeleteUserModal userId={user.id} />
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -122,6 +133,15 @@ export default async function Users({
     role?: string;
   };
 }) {
+  // only admins can access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(["superadmin", "admin"] as smd_Role[]).includes(
+      currentUser?.role ?? "guest",
+    )
+  )
+    redirect("/dashboard");
+
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -147,7 +167,9 @@ export default async function Users({
             <HandleUserRoleFilter />
             <HandleSearch />
           </div>
-          <CreateUserModal />
+          {(["superadmin", "admin"] as smd_Role[]).includes(
+            currentUser?.role ?? "guest",
+          ) && <CreateUserModal />}
         </div>
       </header>
 
@@ -160,7 +182,10 @@ export default async function Users({
           </div>
         }
       >
-        <UsersTable searchParams={searchParams} />
+        <UsersTable
+          searchParams={searchParams}
+          currentUser={currentUser ?? undefined}
+        />
       </Suspense>
     </div>
   );

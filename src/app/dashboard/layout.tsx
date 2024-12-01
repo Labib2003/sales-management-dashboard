@@ -1,5 +1,5 @@
-import { getCurrentUser } from "~/server/actions/auth.actions";
-import SidebarWrapper from "./SidebarWrapper";
+import { getCurrentUser, logout } from "~/server/actions/auth.actions";
+import Sidebar from "./SidebarWrapper";
 import { RedirectType, redirect } from "next/navigation";
 
 export default async function DashboardLayout({
@@ -9,6 +9,7 @@ export default async function DashboardLayout({
 }) {
   const currentUser = await getCurrentUser();
   if (!currentUser) redirect("/auth/login", RedirectType.replace);
+  if (currentUser.role === "guest") await logout();
 
-  return <SidebarWrapper currentUser={currentUser}>{children}</SidebarWrapper>;
+  return <Sidebar currentUser={currentUser}>{children}</Sidebar>;
 }

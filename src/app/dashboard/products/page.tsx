@@ -33,6 +33,9 @@ import { EyeIcon } from "lucide-react";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Suspense } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { getCurrentUser } from "~/server/actions/auth.actions";
+import { type smd_User, type smd_Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 type SearchParams = {
   "vendor-search"?: string;
@@ -45,8 +48,10 @@ type SearchParams = {
 
 const ProductsTable = async ({
   searchParams,
+  currentUser,
 }: {
   searchParams?: SearchParams;
+  currentUser?: smd_User;
 }) => {
   const { total, data: products } = await getProducts({
     page: parseInt(searchParams?.page ?? "1"),
@@ -120,11 +125,17 @@ const ProductsTable = async ({
                   >
                     <EyeIcon />
                   </Link>
-                  <UpdateProductModal
-                    vendors={vendors.data}
-                    product={product}
-                  />
-                  <DeleteProductModal productId={product.id} />
+                  {(["superadmin", "admin"] as smd_Role[]).includes(
+                    currentUser?.role ?? "guest",
+                  ) && (
+                    <>
+                      <UpdateProductModal
+                        vendors={vendors.data}
+                        product={product}
+                      />
+                      <DeleteProductModal productId={product.id} />
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -153,6 +164,15 @@ const CreateProductModalWrapper = async ({
 };
 
 const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
+  // guests cannot access this page
+  const currentUser = await getCurrentUser();
+  if (
+    !(["superadmin", "admin", "manager", "salesman"] as smd_Role[]).includes(
+      currentUser?.role ?? "guest",
+    )
+  )
+    redirect("/dashboard");
+
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -175,15 +195,19 @@ const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
 
         <div className="flex gap-2">
           <HandleSearch />
-          <Suspense
-            fallback={
-              <Skeleton>
-                <Button className="opacity-0">Add Product</Button>
-              </Skeleton>
-            }
-          >
-            <CreateProductModalWrapper searchParams={searchParams} />
-          </Suspense>
+          {(["superadmin", "admin", "manager"] as smd_Role[]).includes(
+            currentUser?.role ?? "guest",
+          ) && (
+            <Suspense
+              fallback={
+                <Skeleton>
+                  <Button className="opacity-0">Add Product</Button>
+                </Skeleton>
+              }
+            >
+              <CreateProductModalWrapper searchParams={searchParams} />
+            </Suspense>
+          )}
         </div>
       </header>
 
@@ -196,7 +220,10 @@ const Products = async ({ searchParams }: { searchParams?: SearchParams }) => {
           </div>
         }
       >
-        <ProductsTable searchParams={searchParams} />
+        <ProductsTable
+          searchParams={searchParams}
+          currentUser={currentUser ?? undefined}
+        />
       </Suspense>
     </div>
   );
